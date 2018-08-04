@@ -1,0 +1,28 @@
+#!/bin/bash
+
+cat <<EOF >/etc/hostname
+{{ hostvars[item]['server_hostname'] }}.{{ hostvars[item]['server_domain_name'] }}
+EOF
+
+cat <<EOF >/etc/sysconfig/network-scripts/ifcfg-eth0
+TYPE=Ethernet
+BOOTPROTO=none
+DEVICE=eth0
+ONBOOT=yes
+IPADDR={{ hostvars[item]['server_networks']['dhcp']['address'].split('/')[0] }}
+PREFIX={{ hostvars[item]['server_networks']['dhcp']['address'].split('/')[1] }}
+EOF
+
+cat <<EOF >/etc/sysconfig/network-scripts/ifcfg-eth1
+TYPE=Ethernet
+BOOTPROTO=none
+DEVICE=eth1
+ONBOOT=yes
+IPADDR={{ hostvars[item]['server_networks']['mgmt']['address'].split('/')[0] }}
+PREFIX={{ hostvars[item]['server_networks']['mgmt']['address'].split('/')[1] }}
+EOF
+
+cat <<EOF >/etc/sysconfig/network
+GATEWAY={{ hostvars[item]['server_networks']['mgmt']['address'] | ipaddr('1') | ipaddr('address') }}
+GATEWAYDEV=eth1
+EOF

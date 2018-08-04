@@ -1,0 +1,72 @@
+################################## ALL HOSTS ##################################
+[all]
+# Local host
+localhost      ansible_connection=local
+
+# MNAIO host
+mnaio1         ansible_host=192.168.24.254 ansible_connection=local
+
+# MNAIO VMs
+director         ansible_host=10.0.236.100
+controller1      ansible_host=10.0.236.101
+controller2      ansible_host=10.0.236.102
+controller3      ansible_host=10.0.236.110
+ceph1            ansible_host=10.0.236.130
+ceph2            ansible_host=10.0.236.131
+compute1         ansible_host=10.0.236.120
+compute2         ansible_host=10.0.236.121
+loadbalancer1    ansible_host=10.0.236.150
+swift1           ansible_host=10.0.236.140
+swift2           ansible_host=10.0.236.141
+swift3           ansible_host=10.0.236.142
+
+################################# MNAIO HOSTS #################################
+
+# The group "vm_hosts" is used to define all host machines that will be running
+#  traditional virtualization using KVM.
+[vm_hosts]
+mnaio1
+
+################################## PXE HOSTS ##################################
+
+# The group "mnaio_hosts" is used to define all host machines that will serve
+#  the purpose of running an MNAIO test environment.
+[mnaio_hosts]
+mnaio1
+
+# The group "pxe_hosts" is used to setup all systems that will be responsible
+#  for PXE boot. This will install all of the needed capabilities to TFTP serve
+#  system images.
+[pxe_hosts]
+mnaio1
+
+# The group "dhcp_hosts" is used to setup all systems that will be responsible
+#  for DHCP. This is not required as external DHCP could be used.
+[dhcp_hosts]
+mnaio1
+
+# The group "pxe_servers" is used to create PXE specific configurations for
+#  each host machines.
+[pxe_servers]
+ceph1
+ceph2
+compute1
+compute2
+director
+controller1
+controller2
+controller3
+loadbalancer1
+swift1
+swift2
+swift3
+
+################################## OSA HOSTS ##################################
+
+# The group "deploy_hosts" is used to define where an OSA deployment will
+#  originate from.
+[deploy_hosts]
+director
+
+[loadbalancer_hosts]
+loadbalancer1

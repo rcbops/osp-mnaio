@@ -1,0 +1,155 @@
+---
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+default_interface: "{{ default_network | default('eth0') }}"
+default_vm_image: "{{ default_image | default('ubuntu-16.04-amd64') }}"
+default_vm_storage: "{{ vm_disk_size | default(92160) }}"
+default_vm_disk_mode: lvm
+default_vm_disk_vg: vg01
+default_acng_bind_address: 0.0.0.0
+default_os_families:
+  ubuntu-16.04-amd64: debian
+  ubuntu-14.04-amd64: debian
+
+default_proxy_url: 'http://192.168.24.254:3142/'
+
+default_container_tech: "{{ container_tech | default('lxc') }}"
+
+ipxe_kernel_url: "http://boot.ipxe.org/ipxe.lkrn"
+
+# The timeout for the SSH check to the vm_servers
+vm_ssh_timeout: 1500
+
+# IP address, or domain name of the TFTP server
+tftp_server: "192.168.24.254"
+# tftp_ssh_key: ''  # user defined ssh key, used to access the host
+tftp_port: 69
+
+# Default ISO images
+images:
+  ubuntu-18.04-amd64:
+    image_type: "debian"
+    image_os: "ubuntu"
+    image-version: "bionic"
+    image_kernel_options: "biosdevname=0 net.ifnames=0 auto=true priority=critical"
+    image_netboot_kernel_url: "http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux"
+    image_netboot_initrd_url: "http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz"
+    image_configs:
+      vm:
+        url: "http://{{ tftp_server }}/configs/vm.config"
+        template_name: "vm.config"
+      vm-compute:
+        url: "http://{{ tftp_server }}/configs/vm-compute.config"
+        template_name: "vm-compute.config"
+  ubuntu-16.04-amd64:
+    image_type: "debian"
+    image_os: "ubuntu"
+    image-version: "xenial"
+    image_kernel_options: "biosdevname=0 net.ifnames=0 auto=true priority=critical"
+    image_netboot_kernel_url: "http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux"
+    image_netboot_initrd_url: "http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz"
+    image_configs:
+      vm:
+        url: "http://{{ tftp_server }}/configs/vm.config"
+        template_name: "vm.config"
+      vm-compute:
+        url: "http://{{ tftp_server }}/configs/vm-compute.config"
+        template_name: "vm-compute.config"
+  ubuntu-14.04-amd64:
+    image_type: "debian"
+    image_os: "ubuntu"
+    image_version: "trusty"
+    image_kernel_options: "biosdevname=0 net.ifnames=0 auto=true priority=critical quiet splash"
+    image_netboot_kernel_url: "http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux"
+    image_netboot_initrd_url: "http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz"
+    image_configs:
+      vm:
+        url: "http://{{ tftp_server }}/configs/vm.config"
+        template_name: "vm.config"
+      vm-compute:
+        url: "http://{{ tftp_server }}/configs/vm-compute.config"
+        template_name: "vm-compute.config"
+  centos-7-amd64:
+    image_type: "redhat"
+    image_version: 7
+    image_netboot_kernel_url: "http://mirrors.edge.kernel.org/centos/7/os/x86_64/images/pxeboot/vmlinuz"
+    image_netboot_initrd_url: "http://mirrors.edge.kernel.org/centos/7/os/x86_64/images/pxeboot/initrd.img"
+    image_repo_base_url: "http://mirrors.edge.kernel.org/centos/7"
+    image_kernel_options: ""
+    image_configs:
+      vm:
+        url: "http://{{ tftp_server }}/configs/vm.config"
+        template_name: "vm.config"
+      vm-compute:
+        url: "http://{{ tftp_server }}/configs/vm-compute.config"
+        template_name: "vm-compute.config"
+  rhel-7.5-amd64:
+    image_type: "redhat"
+    image_version: 7
+    image_netboot_kernel_url: "{{ redhat_base_url }}/os/x86_64/images/pxeboot/vmlinuz"
+    image_netboot_initrd_url: "{{ redhat_base_url }}/os/x86_64/images/pxeboot/initrd.img"
+    image_repo_base_url: "{{ redhat_base_url }}"
+    image_kernel_options: ""
+    image_configs:
+      vm:
+        url: "http://{{ tftp_server }}/configs/rhel.config"
+        template_name: "rhel.config"
+      vm-compute:
+        url: "http://{{ tftp_server }}/configs/vm-compute.config"
+        template_name: "rhel-compute.config"
+# mnaio_data_disk: 'sdc'  # str - not required, set this to define a given data disk if no data disk
+#                                               is defined the largest unpartitioned disk will be used.
+mnaio_host_networks:
+  dhcp:
+    iface: 'vm-br-dhcp'                 # str  - required, interface name
+    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
+    address: '192.168.24.254/24'              # str  - not required, must be in CIDR format
+    iface_port: none                    # str  - required, physical port used within a host bridge
+    address_aliases:                    # list - not required, items must be sting and in CIDR format
+      - '192.168.24.253/24'
+  mgmt:
+    iface: 'vm-br-eth1'
+    inet_type: 'static'
+    address: '10.0.236.1/22'
+    iface_port: none
+  flat:
+    iface: 'vm-br-eth2'
+    inet_type: 'static'
+    address: '10.0.248.1/22'
+    iface_port: none
+  vlan:
+    iface: 'vm-br-eth3'
+    inet_type: 'manual'
+    iface_port: none
+  vxlan:
+    iface: 'vm-br-eth4'
+    inet_type: 'static'
+    address: '10.0.240.1/22'
+    iface_port: none
+  storage:
+    iface: 'vm-br-eth5'
+    inet_type: 'static'
+    address: '10.0.244.1/22'
+    iface_port: none
+
+osa_enable_infra: true
+osa_enable_identity: true
+osa_enable_block_storage: true
+osa_enable_image: true
+osa_enable_compute: true
+osa_enable_orchestration: true
+osa_enable_dashboard: true
+osa_enable_network: true
+osa_enable_meter: true
+osa_enable_object_storage: true
+osa_disable_serial: false

@@ -1,0 +1,277 @@
+---
+# Copyright 2018, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in witing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Gather facts
+  hosts: vm_hosts
+  gather_facts: "{{ gather_facts | default(true) }}"
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  tags:
+    - deploy-vms
+  tasks:
+    - name: Gather variables for each operating system
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}.yml"
+      tags:
+        - always
+
+    - name: Stop running VMs
+      virt:
+        name: "{{ hostvars[item]['server_hostname'] }}"
+        command: destroy
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Delete VM LV
+      lvol:
+        vg: "{{ default_vm_disk_vg }}"
+        lv: "{{ hostvars[item]['server_hostname'] }}"
+        state: absent
+        force: yes
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Delete VM Disk Image
+      file:
+        path: "/var/lib/libvirt/images/{{ hostvars[item]['server_hostname'] }}.img"
+        state: absent
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Undefine the VM
+      virt:
+        name: "{{ hostvars[item]['server_hostname'] }}"
+        command: undefine
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Create VM LV
+      lvol:
+        vg: "{{ default_vm_disk_vg }}"
+        lv: "{{ hostvars[item]['server_hostname'] }}"
+        size: "{{ default_vm_storage }}"
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+        - default_vm_disk_mode | default('lvm') == "lvm"
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Setup file-based disk images
+      when:
+        - default_vm_disk_mode | default('lvm') == "file"
+      block:
+        - name: Find existing base image files
+          find:
+            paths: /var/lib/libvirt/images
+            patterns: '*-base.img'
+          register: _base_images
+
+        - name: Set vm_use_snapshot if it's not defined
+          set_fact:
+            vm_use_snapshot: "{{ _base_images['matched'] > 0 }}"
+          when:
+            - vm_use_snapshot is not defined
+
+        - name: Create VM Disk Image
+          command: >-
+            qemu-img create
+            -f qcow2
+            {% if vm_use_snapshot | bool %}
+            -b /var/lib/libvirt/images/{{ hostvars[item]['server_hostname'] }}-base.img
+            {% endif %}
+            /var/lib/libvirt/images/{{ hostvars[item]['server_hostname'] }}.img
+            {{ default_vm_storage }}m
+          when:
+            - hostvars[item]['server_vm'] | default(false) | bool
+          with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Wait for guest capabilities to appear
+      command: "virsh capabilities"
+      register: virsh_caps
+      until: "'<guest>' in virsh_caps.stdout"
+      retries: 6
+      delay: 10
+
+    - name: Define the VM
+      virt:
+        name: "{{ hostvars[item]['server_hostname'] }}"
+        command: define
+        xml: "{{ lookup('template', 'kvm/kvm-vm.xml.j2') }}"
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Get the VM xml
+      virt:
+        command: get_xml
+        name: "{{ hostvars[item]['server_hostname'] }}"
+      register: vm_xml
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Write the VM xml
+      copy:
+        content: "{{ item.get_xml }}"
+        dest: "/etc/libvirt/qemu/{{ item.item }}.xml"
+      with_items: "{{ vm_xml.results }}"
+
+    - name: Start the VM
+      virt:
+        name: "{{ hostvars[item]['server_hostname'] }}"
+        command: start
+        state: running
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['deploy_hosts'] }}"
+
+    - name: Add VM to /etc/hosts file
+      lineinfile:
+        path: "/etc/hosts"
+        line: "{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['server_hostname'] }}"
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Setup VirtualBMC for each VM for Undercloud to use
+      shell: |
+        vbmc stop {{ hostvars[item]['server_hostname'] }}
+        vbmc delete {{ hostvars[item]['server_hostname'] }}
+        vbmc add {{ hostvars[item]['server_hostname'] }}  --username root --password secrete --address {{ mnaio_host_networks.dhcp.address | ipaddr('address') }} --port {{ hostvars[item]['server_virtual_bmc_port'] }}
+        vbmc start {{ hostvars[item]['server_hostname'] }}
+      failed_when: false
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['pxe_servers'] }}"
+
+- name: Check VM Connectivity
+  import_playbook: vm-status.yml
+
+
+- name: Create vm_servers group
+  hosts: localhost
+  gather_facts: false
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  tags:
+    - deploy-vms
+  tasks:
+    - name: VM Servers group
+      add_host:
+        name: "{{ item }}"
+        groups: vm_servers
+      when:
+        - hostvars[item]['server_vm'] | default(false) | bool
+      with_items: "{{ groups['deploy_hosts'] }}"
+
+
+- name: VM Host Setup
+  hosts: vm_servers
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - name: Copy Host Keys
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "0600"
+      with_items:
+        - src: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa"
+          dest: /root/.ssh/id_rsa
+        - src: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa.pub"
+          dest: /root/.ssh/id_rsa.pub
+
+
+# In vm-post-install-script.sh.j2 we chattr +i the interfaces file to prevent
+# the preseed system from overwriting the file after we've modified it.  The
+# task below simply removes the immutable attribute.
+- name: Remove immutable attr from /etc/network/interfaces
+  hosts: vm_servers
+  gather_facts: true
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  tags:
+    - deploy-vms
+  tasks:
+    - file:
+        path: /etc/network/interfaces
+        attr: ""
+      when:
+        - ansible_distribution | lower == "ubuntu"
+        - ansible_distribution_release | lower == "trusty"
+
+
+- name: Set MaxSessions and MaxStartups to reduce connection failures
+  hosts: vm_servers
+  gather_facts: "{{ gather_facts | default(true) }}"
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  tags:
+    - deploy-vms
+  tasks:
+    - name: Gather variables for each operating system
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}.yml"
+      tags:
+        - always
+
+    - lineinfile:
+        path: /etc/ssh/sshd_config
+        line: MaxStartups 100
+        state: present
+        regexp: '^MaxStartups.*$'
+      notify:
+        - restart sshd
+
+    - lineinfile:
+        path: /etc/ssh/sshd_config
+        line: MaxSessions 100
+        state: present
+        regexp: '^MaxSessions.*$'
+      notify:
+        - restart sshd
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: "{{ ssh_service_name }}"
+        state: restarted
+
+- name: Stop DHCP Services on MNAIO to allow for Director to manage VMs
+  hosts: localhost
+  gather_facts: false
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  tags:
+    - deploy-vms
+  tasks:
+    - name: Stop DHCP Services
+      service:
+        name: "isc-dhcp-server"
+        enabled: no
+        state: stopped

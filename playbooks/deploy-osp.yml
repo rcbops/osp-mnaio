@@ -1,0 +1,184 @@
+---
+# Copyright 2017, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in witing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Setup deploy host
+  hosts: deploy_hosts
+  gather_facts: "{{ gather_facts | default(true) }}"
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  remote_user: stack
+  become: yes
+  tags:
+    - deploy-osa
+  tasks:
+    - name: Gather variables for each operating system
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}.yml"
+      tags:
+        - always
+
+    - name: Register director VM to Red Hat Network
+      redhat_subscription:
+        state: present
+        username: "{{ redhat_username }}"
+        password: "{{ redhat_password }}"
+        consumer_name: "{{ redhat_consumer_name }}"
+        pool_ids: "{{ redhat_pool_id }}"
+
+    - name: Enable Red Hat Repos
+      rhsm_repository:
+        name: "{{ item }}"
+        state: enabled
+      with_items:
+        - rhel-7-server-rpms
+        - rhel-7-server-extras-rpms
+        - rhel-7-server-rh-common-rpms
+        - rhel-ha-for-rhel-7-server-rpms
+        - rhel-7-server-openstack-{{ redhat_osp_version }}-rpms
+
+    - name: Creating directories for the undercloud
+      file:
+        path: "/home/stack/{{ item }}"
+        owner: "stack"
+        group: "stack"
+        mode: 0775
+        state: directory
+      with_items:
+        - images
+        - logs
+        - scripts
+        - templates
+
+    - name: Upgrading all packages, 3-4 minutes
+      yum:
+        name: "*"
+        state: latest
+        update_cache: yes
+      ignore_errors: yes
+
+    - name: Installing helpful tools and packages
+      yum:
+        pkg: "{{ item }}"
+        state: installed
+      with_items:
+        - ntp
+        - tcpdump
+        - policycoreutils-python
+        - sysstat
+        - rsync
+        - tuned
+        - tmux
+        - wget
+        - net-tools
+        - libguestfs-tools
+
+    - name: Validating ntpd is running and enabled
+      service:
+        name: ntpd
+        state: started
+        enabled: yes
+      ignore_errors: True
+
+    - name: Rebooting server after OS upgrade
+      shell: sleep 10 && shutdown -r now
+      async: 300
+      poll: 0
+      ignore_errors: true
+
+    - name: Waiting for server to come back
+      local_action: wait_for
+      args:
+        host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+        port: 22
+        delay: 120
+        timeout: 600
+        state: started
+
+    - name: Installing tripleo client packages
+      yum:
+        pkg: "{{ item }}"
+        state: installed
+      with_items:
+       - python-tripleoclient
+       - ceph-ansible
+
+    - name: Setting up undercloud configuration
+      template:
+        src: osp/undercloud.conf.j2
+        dest: "/home/stack/undercloud.conf"
+        owner: "stack"
+        group: "stack"
+        mode: "0644"
+
+    - name: Setting up instackenv configuration
+      template:
+        src: osp/files/instackenv.json
+        dest: "/home/stack/instackenv.json"
+        owner: "stack"
+        group: "stack"
+        mode: "0644"
+
+    - name: Undercloud deploy - tail -f /home/stack/logs/undercloud_install.log to view progress
+      shell: "openstack undercloud install 2>&1 | tee -a /home/stack/logs/undercloud_install.log"
+      become_user: stack
+
+    - name: Installing Red Hat undercloud images
+      yum:
+        pkg: "{{ item }}"
+        state: installed
+      with_items:
+        - rhosp-director-images
+        - rhosp-director-images-ipa
+
+    - name: Preparing the undercloud post install script
+      template:
+        src: osp/undercloud_post_install_osp.sh.j2
+        dest: "/home/stack/scripts/undercloud-post-install.sh"
+        owner: stack
+        group: root
+        mode: 0754
+
+    - name: Create images, import inventory, attach images, tag nodes, create container registry
+      shell: "/home/stack/scripts/undercloud-post-install.sh 2>&1 | tee -a /home/stack/logs/undercloud_post_install_log"
+      become: true
+      become_user: stack
+
+    - name: Setup overcloud configuation
+      template:
+        src: osp/files/node-info.yaml
+        dest: "/home/stack/templates/node-info.yaml"
+        owner: "stack"
+        group: "stack"
+        mode: "0644"
+
+    - name: Introspect servers
+      shell: |
+        source /home/stack/stackrc
+        openstack overcloud node introspect --all-manageable --provide
+      become_user: stack
+
+    - name: Overcloud deploy - tail -f /home/stack/logs/overcloud_install.log to view progress
+      shell: |
+        source /home/stack/stackrc
+        openstack overcloud deploy --templates \
+        -e /home/stack/templates/node-info.yaml \
+        -e /home/stack/templates/overcloud_images.yaml \
+        --ntp-server pool.ntp.org \
+        2>&1 | tee -a /home/stack/logs/overcloud_install.log
+      become_user: stack

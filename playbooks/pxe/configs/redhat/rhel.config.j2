@@ -1,0 +1,73 @@
+# Server Kickstart - vm
+install
+text
+lang en_US
+keyboard us
+timezone --utc Etc/UTC
+auth --useshadow --enablemd5
+selinux --enforcing
+firewall --disabled
+services --enabled=NetworkManager,sshd
+eula --agreed
+ignoredisk --only-use=vda
+reboot
+
+bootloader --location=mbr
+zerombr
+clearpart --all --initlabel
+part /boot --fstype ext3 --size=512
+part pv.01 --size=1 --grow
+volgroup vmvg00 pv.01
+logvol / --fstype ext4 --name=root00 --vgname=vmvg00 --size=8192 --grow
+rootpw secrete
+user --name=stack --password=secrete
+repo --name=base --baseurl={{ images[default_vm_image]['image_repo_base_url'] }}/os/x86_64/
+repo --name=updates --baseurl={{ images[default_vm_image]['image_repo_base_url'] }}/updates/x86_64/
+url --url="{{ images[default_vm_image]['image_repo_base_url'] }}/os/x86_64/" --proxy {{ default_proxy_url }}
+
+%packages --nobase --ignoremissing
+@core
+wget
+bridge-utils
+btrfs-progs
+dstat
+git
+python
+systemd-networkd
+systemd-resolved
+tmux
+vim
+%end
+
+%post
+(set -x
+echo
+echo "################################"
+echo "# Running Post Configuration   #"
+echo "################################"
+# install ssh key for root/stack
+mkdir -m0700 /root/.ssh/
+cat <<EOF >/root/.ssh/authorized_keys
+{{ tftp_ssh_key }}
+EOF
+chmod 0600 /root/.ssh/authorized_keys
+
+mkdir -m0700 /home/stack/.ssh/
+cat <<EOF >/home/stack/.ssh/authorized_keys
+{{ tftp_ssh_key }}
+EOF
+chmod 0600 /home/stack/.ssh/authorized_keys
+chown -R stack:stack /home/stack/.ssh
+
+# set apt-cacher-ng proxy
+sed -i '/\[main\]/a proxy={{ default_proxy_url }}' /etc/yum.conf
+
+# set sudo perms for stack user
+echo "stack ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/stack
+chmod 0440 /etc/sudoers.d/stack
+
+wget --no-proxy http://{{ tftp_server }}/scripts/osp-post-install-redhat-script.sh -O /opt/osp-post-install-script.sh
+chmod +x /opt/osp-post-install-script.sh
+/opt/osp-post-install-script.sh
+) > /root/post_install.log 2>&1
+%end
