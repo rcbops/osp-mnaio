@@ -118,21 +118,23 @@
        - python-tripleoclient
        - ceph-ansible
 
-    - name: Setting up undercloud configuration
+    - name: Setting up undercloud configurations
       template:
-        src: osp/undercloud.conf.j2
-        dest: "/home/stack/undercloud.conf"
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         owner: "stack"
         group: "stack"
-        mode: "0644"
-
-    - name: Setting up instackenv configuration
-      template:
-        src: osp/files/instackenv.json
-        dest: "/home/stack/instackenv.json"
-        owner: "stack"
-        group: "stack"
-        mode: "0644"
+        mode: "{{ item.mode }}"
+      with_items:
+        - src: "osp/{{ redhat_osp_version }}/undercloud/undercloud.conf.j2"
+          dest: "/home/stack/undercloud.conf"
+          mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/undercloud/instackenv.json"
+          dest: "/home/stack/instackenv.json"
+          mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/undercloud/undercloud_post_install_osp.sh.j2"
+          dest: "/home/stack/scripts/undercloud-post-install.sh"
+          mode: "0754"
 
     - name: Undercloud deploy - tail -f /home/stack/logs/undercloud_install.log to view progress
       shell: "openstack undercloud install 2>&1 | tee -a /home/stack/logs/undercloud_install.log"
@@ -146,26 +148,22 @@
         - rhosp-director-images
         - rhosp-director-images-ipa
 
-    - name: Preparing the undercloud post install script
-      template:
-        src: osp/undercloud_post_install_osp.sh.j2
-        dest: "/home/stack/scripts/undercloud-post-install.sh"
-        owner: stack
-        group: root
-        mode: 0754
-
     - name: Create images, import inventory, attach images, tag nodes, create container registry
       shell: "/home/stack/scripts/undercloud-post-install.sh 2>&1 | tee -a /home/stack/logs/undercloud_post_install_log"
       become: true
       become_user: stack
 
-    - name: Setup overcloud configuation
+    - name: Setting up overcloud configuations
       template:
-        src: osp/files/node-info.yaml
-        dest: "/home/stack/templates/node-info.yaml"
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         owner: "stack"
         group: "stack"
-        mode: "0644"
+        mode: "{{ item.mode }}"
+      with_items:
+        - src: "osp/{{ redhat_osp_version }}/overcloud/node-info.yaml"
+          dest: "/home/stack/templates/node-info.yaml"
+          mode: "0644"
 
     - name: Introspect servers
       shell: |

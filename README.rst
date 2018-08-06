@@ -29,27 +29,14 @@ Ansible OPS so it should work similar but they are several environmental changes
 TODO
 ----
 
-* Add registration process during osp setup by passing user name and password of
-RHEL entitlement account.  Currently you'll need to register the Red Hat VM node
-to continue in the process.
-
 * Overcloud configuation, using basics right now, but need to plug into all MNAIO
-networks.  Overcloud is also kicked off manually for the time being.
-
-* Currently tested and working with OSP 13, need to add abstraction layer to allow
-other versions to be added and tested.
-
-* Notes, can use sshuttle to connect to GUI and CLI:
-
-    sshuttle -e "ssh" -r root@ip_of_mnaio 192.168.24.0/24
-
-More edits to come... notes below are original MNAIO readme content.
+  networks.
 
 Process
 -------
 
 Create at least one physical host that has public network access and is running
-an Ubuntu 14.04/16.04/18.04 LTS Operating system. System assumes that you have an
+an Ubuntu 18.04 LTS Operating system. System assumes that you have an
 unpartitioned device with at least 1TB of storage, however you can customize the
 size of each VM volume by setting the option ``${VM_DISK_SIZE}``. If you're
 using the Rackspace OnMetal servers the drive partitioning will be done for you
@@ -70,10 +57,44 @@ Physical Host Specs known to work well
 
 These specs are covered by the Rackspace OnMetal-IO v1/2 Servers.
 
+Set the variables to configure the Red Hat environment, you'll need to upload or grab
+the RHEL 7.5 ISO and extract it to /var/www/pxe/distros/redhat/7.5/os/x86_64 or
+specify the location of the bits at another location.
+
+.. code-block:: bash
+
+    # location of bits, need to be in /var/www/pxe/distros/redhat/7.5/os/x86_64
+    export REDHAT_BASE_URL="http://192.168.24.254/distros/redhat/7.5/"
+    export REDHAT_USERNAME="rhel_username"
+    export REDHAT_PASSWORD="rhel_password"
+    export REDHAT_CONSUMER_NAME="name_of_instance_to_be_registered"
+    export REDHAT_POOL_ID="pool_id"
+    export REDHAT_OSP_VERSION="13"
+
 When your ready, run the build script by executing ``bash ./build.sh``. The
-build script current executes a deployment of OpenStack Ansible using the master
-branch. If you want to do something other than deploy master you can set the
-``${OSA_BRANCH}`` variable to any branch, tag, or SHA.
+build script current executes a kickstart deployment of RHEL OSP Director,
+creates the undercloud and overcloud.
+
+Once completed, you can access the GUIs using the sshuttle project:
+
+https://github.com/sshuttle/sshuttle
+
+.. code-block:: bash
+
+    sshuttle -e "ssh" -r root@ip_of_mnaio 192.168.24.0/24
+
+Then you can hit the undercloud GUI at https://192.168.24.2 or horizon at
+https://192.168.24.9 (may vary on deployment).
+
+You can also access the director vm directly and use the CLI:
+
+.. code-block:: bash
+
+    ssh stack@director
+    source stackrc
+    openstack baremetal node list
+    source overcloudrc
+    nova list
 
 
 Post Deployment
@@ -92,6 +113,9 @@ OSX:
     access to a X11 client, then make use of X over SSH to connect to the
     virt-manager application. Using X over SSH is covered in
     https://www.cyberciti.biz/faq/apple-osx-mountain-lion-mavericks-install-xquartz-server/
+    Basically load XQuartz, ssh -Y <ip_of_mnaio> and then run virt-manager.
+    This should provide a view of all VMs and you can watch consoles during
+    install.
 
 WINDOWS:
     If you're running Windows, you can install virt-viewer from the KVM Download
@@ -129,13 +153,11 @@ to change this password please edit the pre-seed files.
 Set an external inventory used for the MNAIO:
   ``MNAIO_INVENTORY=${MNAIO_INVENTORY:-playbooks/inventory}``
 
-
 Set to instruct the preseed what the default network is expected to be:
   ``DEFAULT_NETWORK="${DEFAULT_NETWORK:-eth0}"``
 
 Set the VM disk size in gigabytes:
   ``VM_DISK_SIZE="${VM_DISK_SIZE:-252}"``
-
 
 Instruct the system do all of the required host setup:
   ``SETUP_HOST=${SETUP_HOST:-true}``
@@ -146,45 +168,15 @@ Instruct the system do all of the required PXE setup:
 Instruct the system do all of the required DHCPD setup:
   ``SETUP_DHCPD=${SETUP_DHCPD:-true}``
 
-
 Instruct the system to Kick all of the VMs:
   ``DEPLOY_VMS=${DEPLOY_VMS:-true}``
 
 Instruct the VM to use the selected image, eg. ubuntu-16.04-amd64:
   ``DEFAULT_IMAGE=${DEFAULT_IMAGE:-ubuntu-16.04-amd64}``
 
-Instruct the VM to use the selected kernel meta package, eg. linux-generic:
-  ``DEFAULT_KERNEL=${DEFAULT_KERNEL:-linux-image-generic}``
-
-Set the OSA repo for this script to retrieve:
-  ``OSA_REPO=${OSA_REPO:-https://git.openstack.org/openstack/openstack-ansible}``
-
-Set the OSA branch for this script to deploy:
-  ``OSA_BRANCH=${OSA_BRANCH:-master}``
-
-Instruct the system to deploy OpenStack Ansible:
-  ``DEPLOY_OSA=${DEPLOY_OSA:-true}``
-
-Instruct the system to pre-config the envs for running OSA playbooks:
-  ``PRE_CONFIG_OSA=${PRE_CONFIG_OSA:-true}``
-
-Instruct the system to run the OSA playbooks, if you want to deploy other OSA
-powered cloud, you can set it to false:
-  ``RUN_OSA=${RUN_OSA:-true}``
-
-Instruct the system to configure the completed OpenStack deployment with some
-example flavors, images, networks, etc.:
-  ``CONFIGURE_OPENSTACK=${CONFIGURE_OPENSTACK:-true}``
-
 Instruct the system to configure iptables prerouting rules for connecting to
 VMs from outside the host:
   ``CONFIG_PREROUTING=${CONFIG_PREROUTING:-true}``
-
-Insrtuct the system to use a different Ubuntu mirror:
-  ``DEFAULT_MIRROR_HOSTNAME=${DEFAULT_MIRROR_HOSTNAME:-archive.ubuntu.com}``
-
-Instruct the system to use a different Ubuntu mirror base directory:
-  ``DEFAULT_MIRROR_DIR=${DEFAULT_MIRROR_DIR:-/ubuntu}``
 
 Instruct the system to use a set amount of ram for cinder VM type:
   ``CINDER_VM_SERVER_RAM=${CINDER_VM_SERVER_RAM:-2048}``
@@ -238,19 +230,6 @@ Rerunning the build script
 
 The build script can be rerun at any time. By default it will re-kick the entire
 system, destroying all existing VM's.
-
-Deploying OpenStack into the environment
-----------------------------------------
-
-While the build script will deploy OpenStack, you can choose to run this
-manually. To run a basic deploy using a given branch you can use the following
-snippet. Set the ansible option ``osa_branch`` or export the environment
-variable ``OSA_BRANCH`` when using the build.sh script.
-
-.. code-block:: bash
-
-    ansible-playbook -i playbooks/inventory playbooks/deploy-osa.yml -vv -e 'osa_branch=master'
-
 
 Snapshotting an environment before major testing
 ------------------------------------------------
