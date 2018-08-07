@@ -26,7 +26,7 @@ server_default_interface: 'eth0'
 server_mac_address: '52:54:00:bd:80:10'
 server_preseed_ks: 'vm'
 server_extra_options: ''
-server_virtual_bmc_port: '632'
+server_virtual_bmc_port: '633'
 
 server_networks:
   dhcp:
