@@ -34,6 +34,7 @@ openstack baremetal node list | grep compute1 | awk '{print $2}' | xargs -I '{}'
 openstack baremetal node list | grep compute2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:compute,boot_option:local' '{}'
 openstack baremetal node list | grep ceph1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
 openstack baremetal node list | grep ceph2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
+openstack baremetal node list | grep ceph3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
 
 #openstack baremetal node list | grep swift1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:swift-storage,boot_option:local' '{}'
 #openstack baremetal node list | grep swift2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:swift-storage,boot_option:local' '{}'
