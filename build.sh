@@ -22,7 +22,8 @@ source ansible-env.rc
 ansible mnaio_hosts \
         -i ${MNAIO_INVENTORY:-"playbooks/inventory"} \
         -m pip \
-        -a "name=netaddr"
+        -a "name=netaddr" \
+        -a "name=ara"
 
 export MNAIO_ANSIBLE_PARAMETERS=${MNAIO_ANSIBLE_PARAMETERS:-""}
 

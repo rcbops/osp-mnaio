@@ -5,6 +5,11 @@ export ANSIBLE_CACHE_PLUGIN="${ANSIBLE_CACHE_PLUGIN:-jsonfile}"
 export ANSIBLE_CACHE_PLUGIN_CONNECTION="${ANSIBLE_CACHE_PLUGIN_CONNECTION:-/tmp/mnaio_facts}"
 export ANSIBLE_CACHE_PLUGIN_TIMEOUT="${ANSIBLE_CACHE_PLUGIN_TIMEOUT:-86400}"
 
+# set up ara callbacks
+export ANSIBLE_CALLBACK_PLUGINS=/usr/local/lib/python2.7/dist-packages/ara/plugins/callbacks
+export ANSIBLE_ACTION_PLUGINS=/usr/local/lib/python2.7/dist-packages/ara/plugins/actions
+export ANSIBLE_LIBRARY=/usr/local/lib/python2.7/dist-packages/ara/plugins/modules
+
 export ANSIBLE_HOST_KEY_CHECKING=False
 export ANSIBLE_SSH_CONTROL_PATH=/tmp/%%h-%%r
 export ANSIBLE_SSH_ARGS="-o ControlMaster=no \
