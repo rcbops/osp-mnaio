@@ -179,7 +179,12 @@ enable_ui = true
 
 # Whether to install requirements to run the TripleO validations.
 # (boolean value)
-#enable_validations = true
+# NOTE(coreywright): Enable validation of undercloud/director node and
+# undercloud.conf immediately before undercloud deployment.  See
+# https://github.com/openstack/python-tripleoclient/blob/stable/queens/tripleoclient/v1/undercloud_config.py#L577-L578
+# and
+# https://github.com/openstack/python-tripleoclient/blob/stable/queens/tripleoclient/v1/undercloud_preflight.py#L372-L389
+enable_validations = true
 
 # Whether to install the Volume service. It is not currently used in
 # the undercloud. (boolean value)
