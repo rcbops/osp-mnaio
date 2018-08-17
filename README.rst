@@ -57,19 +57,17 @@ Physical Host Specs known to work well
 
 These specs are covered by the Rackspace OnMetal-IO v1/2 Servers.
 
-Set the variables to configure the Red Hat environment, you'll need to upload or grab
-the RHEL 7.5 ISO and extract it to /var/www/pxe/distros/redhat/7.5/os/x86_64 or
-specify the location of the bits at another location.
+Set the variables to configure the Red Hat environment, you'll need to specify the
+location of the RHEL 7.5 ISO which will be retrieved and extracted automatically.
 
 .. code-block:: bash
 
-    # location of bits, need to be in /var/www/pxe/distros/redhat/7.5/os/x86_64
-    export REDHAT_BASE_URL="http://192.168.24.254/distros/redhat/7.5/"
+    export REDHAT_ISO_URL="http://location_of/rhel-7.5.iso"
     export REDHAT_USERNAME="rhel_username"
     export REDHAT_PASSWORD="rhel_password"
     export REDHAT_CONSUMER_NAME="name_of_instance_to_be_registered"
     export REDHAT_POOL_ID="pool_id"
-    export REDHAT_OSP_VERSION="13"
+    export REDHAT_OSP_VERSION="13" # optional, defaults to 13
 
 When your ready, run the build script by executing ``bash ./build.sh``. The
 build script current executes a kickstart deployment of RHEL OSP Director,

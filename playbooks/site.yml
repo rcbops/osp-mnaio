@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- import_playbook: validate.yml
+  when:
+    - validate | default(true) | bool
+
 - import_playbook: setup-host.yml
   when:
     - setup_host | default(true) | bool
