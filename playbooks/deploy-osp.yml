@@ -137,7 +137,10 @@
           mode: "0754"
 
     - name: Undercloud deploy - tail -f /home/stack/logs/undercloud_install.log to view progress
-      shell: "openstack undercloud install 2>&1 | tee -a /home/stack/logs/undercloud_install.log"
+      shell: |
+        set -o pipefail
+        openstack undercloud install \
+        2>&1 | tee /home/stack/logs/undercloud_install.log
       become_user: stack
 
     - name: Installing Red Hat undercloud images
@@ -149,7 +152,10 @@
         - rhosp-director-images-ipa
 
     - name: Create images, import inventory, attach images, tag nodes, create container registry
-      shell: "/home/stack/scripts/undercloud-post-install.sh 2>&1 | tee -a /home/stack/logs/undercloud_post_install_log"
+      shell: |
+        set -o pipefail
+        /home/stack/scripts/undercloud-post-install.sh \
+        2>&1 | tee /home/stack/logs/undercloud_post_install_log
       become: true
       become_user: stack
 
@@ -173,10 +179,11 @@
 
     - name: Overcloud deploy - tail -f /home/stack/logs/overcloud_install.log to view progress
       shell: |
+        set -o pipefail
         source /home/stack/stackrc
         openstack overcloud deploy --templates \
         -e /home/stack/templates/node-info.yaml \
         -e /home/stack/templates/overcloud_images.yaml \
         --ntp-server pool.ntp.org \
-        2>&1 | tee -a /home/stack/logs/overcloud_install.log
+        2>&1 | tee /home/stack/logs/overcloud_install.log
       become_user: stack
