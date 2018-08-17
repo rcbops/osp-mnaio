@@ -140,7 +140,7 @@
       shell: |
         set -o pipefail
         openstack undercloud install \
-        2>&1 | tee -a /home/stack/logs/undercloud_install.log
+        2>&1 | tee /home/stack/logs/undercloud_install.log
       become_user: stack
 
     - name: Installing Red Hat undercloud images
@@ -155,7 +155,7 @@
       shell: |
         set -o pipefail
         /home/stack/scripts/undercloud-post-install.sh \
-        2>&1 | tee -a /home/stack/logs/undercloud_post_install_log
+        2>&1 | tee /home/stack/logs/undercloud_post_install_log
       become: true
       become_user: stack
 
@@ -185,5 +185,5 @@
         -e /home/stack/templates/node-info.yaml \
         -e /home/stack/templates/overcloud_images.yaml \
         --ntp-server pool.ntp.org \
-        2>&1 | tee -a /home/stack/logs/overcloud_install.log
+        2>&1 | tee /home/stack/logs/overcloud_install.log
       become_user: stack
