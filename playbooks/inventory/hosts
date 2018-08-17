@@ -16,10 +16,6 @@ ceph2            ansible_host=10.0.236.131
 ceph3            ansible_host=10.0.236.132
 compute1         ansible_host=10.0.236.120
 compute2         ansible_host=10.0.236.121
-loadbalancer1    ansible_host=10.0.236.150
-swift1           ansible_host=10.0.236.140
-swift2           ansible_host=10.0.236.141
-swift3           ansible_host=10.0.236.142
 
 ################################# MNAIO HOSTS #################################
 
@@ -58,10 +54,6 @@ director
 controller1
 controller2
 controller3
-loadbalancer1
-swift1
-swift2
-swift3
 
 ################################## OSA HOSTS ##################################
 
@@ -69,6 +61,3 @@ swift3
 #  originate from.
 [deploy_hosts]
 director
-
-[loadbalancer_hosts]
-loadbalancer1
