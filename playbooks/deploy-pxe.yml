@@ -53,6 +53,7 @@
         - /var/www/pxe
         - /var/www/pxe/configs
         - /var/www/pxe/images
+        - /var/www/pxe/iso
         - /var/www/pxe/networking
         - /var/www/pxe/scripts
         - /var/www/pxe/templates
@@ -198,23 +199,32 @@
         - src: "rhel.config.j2"
           dest: "rhel.config"
 
-#    - name: Preseeds for pxe vm
-#      template:
-#        src: "pxe/configs/{{ images[default_vm_image]['image_type'] | lower }}/vm.config.j2"
-#        dest: /var/www/pxe/configs/vm.config
-#        mode: "0644"
-#        owner: root
-#        group: root
-#      with_dict: "{{ images }}"
+    - name: Download RHEL ISO
+      get_url:
+        url: "{{ item.value.image_iso_url }}"
+        dest: "/var/www/pxe/iso/{{ item.value.image_name }}"
+      with_dict: "{{ images }}"
 
-#    - name: Preseeds for pxe vm-compute
-#      template:
-#        src: "pxe/configs/{{ images[default_vm_image]['image_type'] | lower }}/vm-compute.config.j2"
-#        dest: /var/www/pxe/configs/vm-compute.config
-#        mode: "0644"
-#        owner: root
-#        group: root
-#      with_dict: "{{ images }}"
+    - name: Remove image directory if it exists
+      file:
+        path: "{{ item.value.image_iso_contents_dir }}"
+        state: absent
+      with_dict: "{{ images }}"
+
+    - name: Create image directory if it exists
+      file:
+        path: "{{ item.value.image_iso_contents_dir }}"
+        state: directory
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      with_dict: "{{ images }}"
+
+    - name: Extract ISO(s) contents
+      command: "7z x /var/www/pxe/iso/{{ item.value.image_name }}"
+      args:
+        chdir: "{{ item.value.image_iso_contents_dir }}"
+      with_dict: "{{ images }}"
 
     - name: Ensure permissions are correct
       file:

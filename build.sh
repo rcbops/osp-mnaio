@@ -49,6 +49,7 @@ ansible-playbook -vv \
                  -e swift_vm_server_ram=${SWIFT_VM_SERVER_RAM:-"2048"} \
                  -e container_tech=${CONTAINER_TECH:-"lxc"} \
                  -e ipxe_kernel_url=${IPXE_KERNEL_URL:-"http://boot.ipxe.org/ipxe.lkrn"} \
+                 -e redhat_iso_url=${REDHAT_ISO_URL:-""} \
                  -e redhat_base_url=${REDHAT_BASE_URL:-"http://192.168.24.254/distros/redhat/7.5/"} \
                  -e redhat_username=${REDHAT_USERNAME:-""} \
 		 -e redhat_password=${REDHAT_PASSWORD:-""} \

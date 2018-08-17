@@ -42,6 +42,9 @@ images:
   rhel-7.5-amd64:
     image_type: "redhat"
     image_version: 7
+    image_name: "rhel-server-7.5-x86_64-dvd.iso"
+    image_iso_url: "{{ redhat_iso_url }}"
+    image_iso_contents_dir: "/var/www/pxe/distros/redhat/7.5/os/x86_64/"
     image_netboot_kernel_url: "{{ redhat_base_url }}/os/x86_64/images/pxeboot/vmlinuz"
     image_netboot_initrd_url: "{{ redhat_base_url }}/os/x86_64/images/pxeboot/initrd.img"
     image_repo_base_url: "{{ redhat_base_url }}"

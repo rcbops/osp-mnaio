@@ -1,0 +1,14 @@
+---
+- name: Fail if RedHat vars have not been defined
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Checking that required variables are defined
+      assert:
+        that:
+          - redhat_iso_url != ""
+          - redhat_username != ""
+          - redhat_password != ""
+          - redhat_consumer_name != ""
+          - redhat_pool_id != ""
+        msg: Ensure all REDHAT variables have been set.  These are for the RHEL ISO location as well as RH Registration creds.
