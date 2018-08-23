@@ -159,6 +159,13 @@
       become: true
       become_user: stack
 
+    - name: Copy rhel-registration scripts to templates directory
+      synchronize:
+        src: /usr/share/openstack-tripleo-heat-templates/extraconfig/pre_deploy/rhel-registration
+        dest: /home/stack/templates/
+      delegate_to: "{{ inventory_hostname }}"
+      become_user: stack
+
     - name: Setting up overcloud configuations
       template:
         src: "{{ item.src }}"
@@ -170,6 +177,12 @@
         - src: "osp/{{ redhat_osp_version }}/overcloud/node-info.yaml"
           dest: "/home/stack/templates/node-info.yaml"
           mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/environment-rhel-registration.yaml.j2"
+          dest: "/home/stack/templates/rhel-registration/environment-rhel-registration.yaml"
+          mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/overcloud-deploy.sh.j2"
+          dest: "/home/stack/overcloud-deploy.sh"
+          mode: "0744"
 
     - name: Introspect servers
       shell: |
@@ -178,12 +191,7 @@
       become_user: stack
 
     - name: Overcloud deploy - tail -f /home/stack/logs/overcloud_install.log to view progress
-      shell: |
-        set -o pipefail
-        source /home/stack/stackrc
-        openstack overcloud deploy --templates \
-        -e /home/stack/templates/node-info.yaml \
-        -e /home/stack/templates/overcloud_images.yaml \
-        --ntp-server pool.ntp.org \
-        2>&1 | tee /home/stack/logs/overcloud_install.log
+      shell: bash overcloud-deploy.sh
+      args:
+        chdir: /home/stack
       become_user: stack

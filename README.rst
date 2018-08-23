@@ -69,6 +69,13 @@ location of the RHEL 7.5 ISO which will be retrieved and extracted automatically
     export REDHAT_POOL_ID="pool_id"
     export REDHAT_OSP_VERSION="13" # optional, defaults to 13
 
+If you need to do a full test and require all Overcloud nodes to RHN register set
+the following, currently false by default:
+
+.. code-block:: bash
+
+    export REDHAT_OVERCLOUD_REGISTER="true"
+
 When your ready, run the build script by executing ``bash ./build.sh``. The
 build script current executes a kickstart deployment of RHEL OSP Director,
 creates the undercloud and overcloud.
