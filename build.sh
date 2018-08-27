@@ -52,10 +52,11 @@ ansible-playbook -vv \
                  -e redhat_iso_url=${REDHAT_ISO_URL:-""} \
                  -e redhat_base_url=${REDHAT_BASE_URL:-"http://192.168.24.254/distros/redhat/7.5/"} \
                  -e redhat_username=${REDHAT_USERNAME:-""} \
-		 -e redhat_password=${REDHAT_PASSWORD:-""} \
-		 -e redhat_consumer_name=${REDHAT_CONSUMER_NAME:-""} \
-		 -e redhat_pool_id=${REDHAT_POOL_ID:-""} \
-		 -e redhat_osp_version=${REDHAT_OSP_VERSION:-"13"} \
+                 -e redhat_password=${REDHAT_PASSWORD:-""} \
+                 -e redhat_consumer_name=${REDHAT_CONSUMER_NAME:-""} \
+                 -e redhat_pool_id=${REDHAT_POOL_ID:-""} \
+                 -e redhat_osp_version=${REDHAT_OSP_VERSION:-"13"} \
+                 -e redhat_overcloud_register=${REDHAT_OVERCLOUD_REGISTER:-'false'} \
                  -e ipxe_path_url=${IPXE_PATH_URL:-""} ${MNAIO_ANSIBLE_PARAMETERS} \
                  --force-handlers \
                  --flush-cache \
