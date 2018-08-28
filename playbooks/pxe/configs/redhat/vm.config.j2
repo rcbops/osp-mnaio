@@ -59,9 +59,6 @@ cat <<EOF >/root/.ssh/authorized_keys
 EOF
 chmod 0600 /root/.ssh/authorized_keys
 
-# set apt-cacher-ng proxy
-sed -i '/\[main\]/a proxy={{ default_proxy_url }}' /etc/yum.conf
-
 # kickstart has issues setting fstype to btrfs, so this converts the machines lvm partition to btrfs
 modprobe btrfs
 umount /dev/vmvg00/machines00
