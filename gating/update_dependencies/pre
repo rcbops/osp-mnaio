@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Dependency updates are checked periodically. A project should codify the
+# process for updating the working directory of the repository with any changes
+# to upstream dependencies. If changes are made, the job will automatically
+# create a new pull request.
+
+# pre is an optional executable for preparing the node prior to running the
+# build. This step is retried on failure given that it performs preparatory
+# actions and not the actual function of the job. Examples of actions that
+# should be taken here include things that would be performed manually such as
+# setting configuration options.
