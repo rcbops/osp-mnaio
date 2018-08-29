@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Dependency updates are checked periodically. A project should codify the
+# process for updating the working directory of the repository with any changes
+# to upstream dependencies. If changes are made, the job will automatically
+# create a new pull request.
+
+# run is a required executable that executes the purpose of the job. For
+# example, if the project deploys some software, this file would be used to
+# perform the deployment and then test the success of the operation.

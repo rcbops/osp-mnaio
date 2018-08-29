@@ -1,0 +1,5 @@
+# This file records the specific versions of dependencies that a project should
+# use. Put another way it is used to pin component dependencies. This file
+# should be updated automatically by the dependency update job.
+
+{}

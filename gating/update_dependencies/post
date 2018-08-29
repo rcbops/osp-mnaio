@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Dependency updates are checked periodically. A project should codify the
+# process for updating the working directory of the repository with any changes
+# to upstream dependencies. If changes are made, the job will automatically
+# create a new pull request.
+
+# post is an optional executable that is the last stage to run. It is used to
+# perform actions that make use of the data generated. Such actions include log
+# aggregation and preparing the node to be used as an image.
