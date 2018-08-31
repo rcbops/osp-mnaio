@@ -48,9 +48,6 @@ libselinux-python [platform:redhat]
 libsemanage-python [platform:redhat]
 
 # For SSL SNI support
-python-pyasn1               [platform:dpkg platform:suse]
-python-openssl              [platform:dpkg]
-python-ndg-httpsclient      [platform:ubuntu !platform:ubuntu-14]
 python2-pyasn1              [platform:redhat]
 python2-pyOpenSSL           [platform:redhat !platform:fedora]
 pyOpenSSL                   [platform:fedora]

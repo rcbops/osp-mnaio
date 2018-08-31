@@ -36,3 +36,8 @@ if [[ "$(basename ${PWD})" == "osp-mnaio" ]]; then
     ln -sfn ${PWD} /opt/osp-mnaio
   fi
 fi
+
+# We need to ensure that we use the rackspace mirrors, as they are
+# most reliable. We also need to ensure that python and the python
+# yaml library are present for ansible to work.
+source "$(readlink -f $(dirname ${0}))/../gating_prerequisites.sh"
