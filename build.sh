@@ -22,8 +22,7 @@ source ansible-env.rc
 ansible mnaio_hosts \
         -i ${MNAIO_INVENTORY:-"playbooks/inventory"} \
         -m pip \
-        -a "name=netaddr" \
-        -a "name=ara"
+        -a "name=netaddr"
 
 export MNAIO_ANSIBLE_PARAMETERS=${MNAIO_ANSIBLE_PARAMETERS:-""}
 
@@ -37,17 +36,11 @@ ansible-playbook -vv \
                  -e default_image=${DEFAULT_IMAGE:-"rhel-7.5-amd64"} \
                  -e vm_disk_size=${VM_DISK_SIZE:-92160} \
                  -e http_proxy=${http_proxy:-''} \
-                 -e pre_config_osa=${PRE_CONFIG_OSA:-"true"} \
-                 -e configure_openstack=${CONFIGURE_OPENSTACK:-"true"} \
                  -e config_prerouting=${CONFIG_PREROUTING:-"true"} \
-                 -e default_ubuntu_kernel=${DEFAULT_KERNEL:-"linux-image-generic"} \
-                 -e cinder_vm_server_ram=${CINDER_VM_SERVER_RAM:-"2048"} \
+                 -e ceph_vm_server_ram=${CEPH_VM_SERVER_RAM:-"4096"} \
                  -e compute_vm_server_ram=${COMPUTE_VM_SERVER_RAM:-"8196"} \
-                 -e infra_vm_server_ram=${INFRA_VM_SERVER_RAM:-"8196"} \
-                 -e loadbalancer_vm_server_ram=${LOADBALANCER_VM_SERVER_RAM:-"2048"} \
-                 -e logging_vm_server_ram=${LOGGING_VM_SERVER_RAM:-"2048"} \
-                 -e swift_vm_server_ram=${SWIFT_VM_SERVER_RAM:-"2048"} \
-                 -e container_tech=${CONTAINER_TECH:-"lxc"} \
+                 -e controller_vm_server_ram=${CONTROLLER_VM_SERVER_RAM:-"16384"} \
+                 -e director_vm_server_ram=${DIRECTOR_VM_SERVER_RAM:-"16384"} \
                  -e ipxe_kernel_url=${IPXE_KERNEL_URL:-"http://boot.ipxe.org/ipxe.lkrn"} \
                  -e redhat_iso_url=${REDHAT_ISO_URL:-""} \
                  -e redhat_base_url=${REDHAT_BASE_URL:-"http://192.168.24.254/distros/redhat/7.5/"} \

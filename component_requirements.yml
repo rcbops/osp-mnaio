@@ -2,4 +2,11 @@
 # use. Put another way it is used to pin component dependencies. This file
 # should be updated automatically by the dependency update job.
 
-{}
+{  
+   "artifacts":[  
+      {  
+         "type":"log",
+         "source":"/buildlogs"
+      }
+   ]
+}

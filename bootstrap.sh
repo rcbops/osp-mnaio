@@ -41,7 +41,7 @@ esac
 # Install pip
 if ! which pip &>/dev/null; then
     curl --silent --show-error --retry 5 \
-        https://bootstrap.pypa.io/3.2/get-pip.py | sudo python2.7
+        https://bootstrap.pypa.io/get-pip.py | sudo python2.7
 fi
 
 # Install bindep and tox
@@ -83,5 +83,8 @@ if [[ ${#BINDEP_PKGS} > 0 ]]; then
     esac
 fi
 
+# install pyopenssl
+sudo python -m easy_install --upgrade pyOpenSSL
+
 # install latest OSA supported Ansible version
-sudo pip install -r https://git.openstack.org/cgit/openstack/openstack-ansible-tests/plain/test-ansible-deps.txt
+sudo pip install ansible ara
