@@ -41,6 +41,7 @@ ansible-playbook -vv \
                  -e compute_vm_server_ram=${COMPUTE_VM_SERVER_RAM:-"8196"} \
                  -e controller_vm_server_ram=${CONTROLLER_VM_SERVER_RAM:-"16384"} \
                  -e director_vm_server_ram=${DIRECTOR_VM_SERVER_RAM:-"16384"} \
+                 -e director_vm_server_vcpus=${DIRECTOR_VM_SERVER_VCPUS:-"8"} \
                  -e ipxe_kernel_url=${IPXE_KERNEL_URL:-"http://boot.ipxe.org/ipxe.lkrn"} \
                  -e redhat_iso_url=${REDHAT_ISO_URL:-""} \
                  -e redhat_base_url=${REDHAT_BASE_URL:-"http://192.168.24.254/distros/redhat/7.5/"} \
