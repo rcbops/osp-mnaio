@@ -59,9 +59,6 @@ EOF
 chmod 0600 /home/stack/.ssh/authorized_keys
 chown -R stack:stack /home/stack/.ssh
 
-# set apt-cacher-ng proxy
-sed -i '/\[main\]/a proxy={{ default_proxy_url }}' /etc/yum.conf
-
 # set sudo perms for stack user
 echo "stack ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/stack
 chmod 0440 /etc/sudoers.d/stack
