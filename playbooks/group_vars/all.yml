@@ -71,24 +71,30 @@ mnaio_host_networks:
     inet_type: 'static'
     address: '10.0.236.1/22'
     iface_port: none
-  flat:
+  tenant:
     iface: 'vm-br-eth2'
     inet_type: 'static'
-    address: '10.0.248.1/22'
+    address: '172.16.0.1/24'
     iface_port: none
-  vlan:
+  internal_api:
     iface: 'vm-br-eth3'
-    inet_type: 'manual'
+    inet_type: 'static'
+    address: '172.16.2.1/24'
     iface_port: none
-  vxlan:
+  external:
     iface: 'vm-br-eth4'
     inet_type: 'static'
-    address: '10.0.240.1/22'
+    address: '10.0.0.0/24'
     iface_port: none
   storage:
     iface: 'vm-br-eth5'
     inet_type: 'static'
-    address: '10.0.244.1/22'
+    address: '172.16.1.1/24'
+    iface_port: none
+  storage_mgmt:
+    iface: 'vm-br-eth6'
+    inet_type: 'static'
+    address: '172.16.3.1/24'
     iface_port: none
 
 osa_enable_infra: true

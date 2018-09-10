@@ -38,22 +38,23 @@ server_networks:
     inet_type: 'static'
     address: '10.0.236.102/22'
     vm_int_iface: vm-br-eth1
-  flat:
+  tenant:
     iface: 'eth2'
     inet_type: 'static'
-    address: '10.0.248.102/22'
     vm_int_iface: vm-br-eth2
-  vlan:
+  internal_api:
     iface: 'eth3'
     inet_type: 'manual'
     vm_int_iface: vm-br-eth3
-  vxlan:
+  external:
     iface: 'eth4'
     inet_type: 'static'
-    address: '10.0.240.102/22'
     vm_int_iface: vm-br-eth4
   storage:
     iface: 'eth5'
     inet_type: 'static'
-    address: '10.0.244.102/22'
     vm_int_iface: vm-br-eth5
+  storage_mgmt:
+    iface: 'eth6'
+    inet_type: 'static'
+    vm_int_iface: vm-br-eth6

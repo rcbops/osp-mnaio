@@ -29,33 +29,34 @@ server_preseed_ks: 'vm'                                     # str  - required, n
 server_extra_options: ''                                    # str  - not required, added kernel options
 server_virtual_bmc_port: '623'                              # int - virtualbmc port
 
-server_networks:                        # dict - required, hash of networks, can be empty, key is used to name the networks.
+server_networks:
   dhcp:
-    iface: 'eth0'                       # str  - required, interface name
-    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
+    iface: 'eth0'
+    inet_type: 'static' 
     address: '192.168.24.2/24'
-    vm_int_iface: vm-br-dhcp            # str  - not Required, used to specify an integration networks interface when provisioning a VM
+    vm_int_iface: vm-br-dhcp
   mgmt:
-    iface: 'eth1'                       # str  - required, interface name
-    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
-    address: '10.0.236.100/22'          # str  - not required, must be in CIDR format
-    vm_int_iface: vm-br-eth1            # str  - not Required, used to specify an integration networks interface when provisioning a VM
-  flat:
-    iface: 'eth2'                       # str  - required, interface name
-    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
-    address: '10.0.248.100/22'          # str  - not required, must be in CIDR format
-    vm_int_iface: vm-br-eth2            # str  - not Required, used to specify an integration networks interface when provisioning a VM
-  vlan:
-    iface: 'eth3'                       # str  - required, interface name
-    inet_type: 'manual'                 # str  - required, iface type [static, dhcp, manual]
-    vm_int_iface: vm-br-eth3            # str  - not Required, used to specify an integration networks interface when provisioning a VM
-  vxlan:
-    iface: 'eth4'                       # str  - required, interface name
-    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
-    address: '10.0.240.100/22'          # str  - not required, must be in CIDR format
-    vm_int_iface: vm-br-eth4            # str  - not Required, used to specify an integration networks interface when provisioning a VM
+    iface: 'eth1'
+    inet_type: 'static'
+    address: '10.0.236.100/22'
+    vm_int_iface: vm-br-eth1
+  tenant:
+    iface: 'eth2'
+    inet_type: 'static'
+    vm_int_iface: vm-br-eth2
+  internal_api:
+    iface: 'eth3'
+    inet_type: 'manual'
+    vm_int_iface: vm-br-eth3
+  external:
+    iface: 'eth4'
+    inet_type: 'static'
+    vm_int_iface: vm-br-eth4
   storage:
-    iface: 'eth5'                       # str  - required, interface name
-    inet_type: 'static'                 # str  - required, iface type [static, dhcp, manual]
-    address: '10.0.244.100/22'          # str  - not required, must be in CIDR format
-    vm_int_iface: vm-br-eth5            # str  - not Required, used to specify an integration networks interface when provisioning a VM
+    iface: 'eth5'
+    inet_type: 'static'
+    vm_int_iface: vm-br-eth5
+  storage_mgmt:
+    iface: 'eth6'
+    inet_type: 'static'
+    vm_int_iface: vm-br-eth6
