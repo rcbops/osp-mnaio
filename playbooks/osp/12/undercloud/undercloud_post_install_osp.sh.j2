@@ -26,25 +26,12 @@ openstack overcloud node import /home/stack/instackenv.json
 # set dns servers
 openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 ctlplane-subnet
 
-# Tagging nodes roles and names, we require to know the servers IDs first
-openstack baremetal node list | grep controller1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
-openstack baremetal node list | grep controller2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
-openstack baremetal node list | grep controller3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
-openstack baremetal node list | grep compute1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:compute,boot_option:local' '{}'
-openstack baremetal node list | grep compute2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:compute,boot_option:local' '{}'
-openstack baremetal node list | grep ceph1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
-openstack baremetal node list | grep ceph2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
-openstack baremetal node list | grep ceph3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
-
-#openstack baremetal node list | grep swift1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:swift-storage,boot_option:local' '{}'
-#openstack baremetal node list | grep swift2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:swift-storage,boot_option:local' '{}'
-
 # Configuring the Overcloud to Use the Undercloud as a Local Registry
 LATEST_IMAGE_TAG=`sudo openstack overcloud container image tag discover \
 		  --image registry.access.redhat.com/rhosp12/openstack-base:latest \
 	          --tag-from-label version-release`
 
-sudo openstack overcloud container image prepare \
+openstack overcloud container image prepare \
 		  --namespace=registry.access.redhat.com/rhosp12 \
 	          --prefix=openstack- \
 	          --tag=${LATEST_IMAGE_TAG} \
