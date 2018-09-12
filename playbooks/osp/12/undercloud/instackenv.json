@@ -13,7 +13,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "624"
+            "pm_port": "624",
+            "capabilities": "profile:control,boot_option:local"
         },
         {
             "mac":[
@@ -28,7 +29,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "625"
+            "pm_port": "625",
+            "capabilities": "profile:control,boot_option:local"
         },
         {
             "mac":[
@@ -43,7 +45,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "626"
+            "pm_port": "626",
+            "capabilities": "profile:control,boot_option:local"
         },
         {
             "mac":[
@@ -58,7 +61,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "627"
+            "pm_port": "627",
+            "capabilities": "profile:compute,boot_option:local"
         },
         {
             "mac":[
@@ -73,7 +77,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "628"
+            "pm_port": "628",
+            "capabilities": "profile:compute,boot_option:local"
         },
         {
             "mac":[
@@ -88,7 +93,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "629"
+            "pm_port": "629",
+            "capabilities": "profile:ceph-storage,boot_option:local"
         },
         {
             "mac":[
@@ -103,7 +109,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "630"
+            "pm_port": "630",
+            "capabilities": "profile:ceph-storage,boot_option:local"
         },
         {
             "mac":[
@@ -118,7 +125,8 @@
             "pm_user":"root",
             "pm_password":"secrete",
             "pm_addr":"192.168.24.254",
-            "pm_port": "631"
+            "pm_port": "631",
+            "capabilities": "profile:ceph-storage,boot_option:local"
         }
     ]
 }
