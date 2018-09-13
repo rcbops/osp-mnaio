@@ -15,3 +15,19 @@
 # release notes should be formatted with GitHub-flavoured Markdown.
 # RE_HOOK_REPO_HTTP_URL: The URL for the repository being released e.g.
 # https://github.com/rcbops/rpc-openstack.git.
+
+# This script is called by Jenkins to generate release notes.
+
+# The resulting notes must be written to $WORKSPACE/artifacts/release_notes
+
+export PREVIOUS_TAG=${RE_HOOK_PREVIOUS_VERSION}
+export NEW_TAG=${RE_HOOK_VERSION}
+export REPO_URL=${RE_HOOK_REPO_HTTP_URL}
+
+apt-get install -y pandoc
+
+pip install reno==2.5.1
+
+gating/generate_release_notes/generate_release_notes.sh
+
+cp all_notes.md "${RE_HOOK_RELEASE_NOTES}"
