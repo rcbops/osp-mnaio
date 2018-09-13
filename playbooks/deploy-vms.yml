@@ -40,6 +40,20 @@
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
 
+    - name: Delete Ceph VM Data LVs
+      lvol:
+        vg: vg01
+        lv: "{{ hostvars[item[0]]['server_hostname'] }}-{{ item[1] }}"
+        size: "{{ hostvars[item[0]]['ceph_osds_size'] }}"
+        state: absent
+        force: yes
+      when:
+        - enable_ceph_storage | default(false) | bool
+        - hostvars[item[0]]['server_vm'] | default(false) | bool
+      with_nested:
+        - "{{ groups['ceph_hosts'] }}"
+        - [ 'disk1', 'disk2', 'disk3', 'disk4', 'disk5', 'disk6', 'disk7', 'disk8' ]
+
     - name: Delete VM LV
       lvol:
         vg: "{{ default_vm_disk_vg }}"
@@ -77,6 +91,18 @@
         - hostvars[item]['server_vm'] | default(false) | bool
         - default_vm_disk_mode | default('lvm') == "lvm"
       with_items: "{{ groups['pxe_servers'] }}"
+
+    - name: Create Ceph VM Data LVs
+      lvol:
+        vg: vg01
+        lv: "{{ hostvars[item[0]]['server_hostname'] }}-{{ item[1] }}"
+        size: "{{ hostvars[item[0]]['ceph_osds_size'] }}"
+      when:
+        - enable_ceph_storage | default(false) | bool
+        - hostvars[item[0]]['server_vm'] | default(false) | bool
+      with_nested:
+        - "{{ groups['ceph_hosts'] }}"
+        - [ 'disk1', 'disk2', 'disk3', 'disk4', 'disk5', 'disk6', 'disk7', 'disk8' ]
 
     - name: Setup file-based disk images
       when:

@@ -1,0 +1,17 @@
+parameter_defaults:
+  CephAnsiblePlaybookVerbosity: 1
+  CephConfigOverrides:
+    journal_size: {{ ceph_journal_size }}
+    max_open_files: 131072
+  CephAnsibleDisksConfig:
+    osd_scenario: non-collocated
+    devices:
+      - /dev/vdf
+      - /dev/vdg
+      - /dev/vdh
+      - /dev/vdi
+    dedicated_devices:
+      - /dev/vdb
+      - /dev/vdc
+      - /dev/vdd
+      - /dev/vde

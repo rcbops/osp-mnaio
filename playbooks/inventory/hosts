@@ -55,6 +55,11 @@ controller1
 controller2
 controller3
 
+[ceph_hosts]
+ceph1
+ceph2
+ceph3
+
 ################################## OSA HOSTS ##################################
 
 # The group "deploy_hosts" is used to define where an OSA deployment will
