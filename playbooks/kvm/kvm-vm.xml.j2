@@ -26,6 +26,7 @@
   </features>
   <cpu mode='host-model'>
     <topology sockets='1' cores='{{ hostvars[item]["server_vm_vcpus"] | int }}' threads='{{ vcpus_threads | int }}'/>
+    <feature policy='require' name='vmx'/>
   </cpu>
   <clock offset='utc'>
     <timer name='rtc' tickpolicy='catchup'/>
