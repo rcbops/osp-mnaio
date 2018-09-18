@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Prepare the undercloud for deploy
 
 set -eux
@@ -22,6 +21,10 @@ openstack overcloud node import /home/stack/instackenv.json
 
 # Associate images to nodes
 #openstack baremetal configure boot
+
+# copy undercloud cert into undercloud_ssl_camap yml for injection into control nodes
+sudo cat /etc/pki/tls/certs/undercloud-192.168.24.2.pem | sed 's/^/        /' >> /home/stack/templates/undercloud_ssl_camap.yaml
+sudo chown stack:stack /home/stack/templates/undercloud_ssl_camap.yaml
 
 # set dns servers
 openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 ctlplane-subnet

@@ -8,6 +8,7 @@ source /home/stack/stackrc
 openstack overcloud deploy --templates \
    -e /home/stack/templates/node-info.yaml \
    -e /home/stack/templates/overcloud_images.yaml \
+   -e /home/stack/templates/undercloud_ssl_camap.yaml \
 {% if redhat_overcloud_register | bool %}
    -e /home/stack/templates/rhel-registration/environment-rhel-registration.yaml \
    -e /home/stack/templates/rhel-registration/rhel-registration-resource-registry.yaml \
