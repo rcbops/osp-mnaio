@@ -20,7 +20,7 @@
   remote_user: stack
   become: yes
   tags:
-    - deploy-osa
+    - deploy-osp
   tasks:
     - name: Gather variables for each operating system
       include_vars: "{{ item }}"
