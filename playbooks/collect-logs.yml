@@ -1,0 +1,63 @@
+---
+# Copyright 2017, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in witing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Collect OpenStack service logs
+  hosts: deploy_hosts
+  gather_facts: "{{ gather_facts | default(true) }}"
+  environment: "{{ deployment_environment_variables | default({}) }}"
+  remote_user: stack
+  become: yes
+  tasks:
+    - name: Gather variables for each operating system
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_distribution | lower }}.yml"
+        - "{{ playbook_dir }}/vars/{{ ansible_os_family | lower }}.yml"
+      tags:
+        - always
+
+    - name: Insure redhat_osp_version is set
+      fail: msg="Ansible extra var `redhat_osp_version' not provided."
+      when: redhat_osp_version is undefined or redhat_osp_version == ""
+
+    - name: Insure log_dir is set
+      fail: msg="Ansible extra var `log_dir' not provided."
+      when: log_dir is undefined or log_dir == ""
+
+    - name: Copy overcloud log collection script to director node
+      copy:
+        src: "osp/{{ redhat_osp_version }}/overcloud/overcloud-logs.sh"
+        dest: "/home/stack/scripts/overcloud-logs.sh"
+        owner: "stack"
+        group: "stack"
+        mode: "0754"
+
+    - name: Collect overcloud logs on director node
+      shell: |
+        set -o pipefail
+        bash /home/stack/scripts/overcloud-logs.sh \
+        2>&1 | tee /home/stack/logs/overcloud_logs.log
+      args:
+        chdir: /home/stack
+      become_user: stack
+
+    - name: Copy overcloud logs from director node
+      synchronize:
+        mode: pull
+        src: "/home/stack/logs/overcloud/."
+        dest: "{{ log_dir }}/"
