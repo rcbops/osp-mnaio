@@ -79,6 +79,7 @@
             "pm_addr":"192.168.24.254",
             "pm_port": "628",
             "capabilities": "profile:compute,boot_option:local"
+{% if enable_ceph_storage | bool %}
         },
         {
             "mac":[
@@ -88,6 +89,9 @@
             "cpu":"2",
             "memory":"2048",
             "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
             "pm_user":"root",
@@ -104,6 +108,9 @@
             "cpu":"2",
             "memory":"2048",
             "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
             "pm_user":"root",
@@ -120,6 +127,9 @@
             "cpu":"2",
             "memory":"2048",
             "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
             "pm_user":"root",
@@ -128,5 +138,8 @@
             "pm_port": "631",
             "capabilities": "profile:ceph-storage,boot_option:local"
         }
+{% else %}
+        }
+{% endif %}
     ]
 }

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Prepare the undercloud for deploy
 
 set -eux
@@ -23,16 +22,22 @@ openstack overcloud node import /home/stack/instackenv.json
 # Associate images to nodes
 #openstack baremetal configure boot
 
+# copy undercloud cert into undercloud_ssl_camap yml for injection into control nodes
+sudo cat /etc/pki/tls/certs/undercloud-192.168.24.2.pem | sed 's/^/        /' >> /home/stack/templates/undercloud_ssl_camap.yaml
+sudo chown stack:stack /home/stack/templates/undercloud_ssl_camap.yaml
+
 # set dns servers
 openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 ctlplane-subnet
 
 openstack overcloud container image prepare \
-  -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/sahara.yaml \
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/manila.yaml \
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/octavia.yaml \
+{% if enable_ceph_storage | bool %}
+  -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
   --set ceph_namespace=registry.access.redhat.com/rhceph \
   --set ceph_image=rhceph-3-rhel7 \
+{% endif %}
   --namespace=registry.access.redhat.com/rhosp13 \
   --push-destination=192.168.24.1:8787 \
   --prefix=openstack- \

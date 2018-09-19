@@ -129,12 +129,15 @@
         - src: "osp/{{ redhat_osp_version }}/undercloud/undercloud.conf.j2"
           dest: "/home/stack/undercloud.conf"
           mode: "0644"
-        - src: "osp/{{ redhat_osp_version }}/undercloud/instackenv.json"
+        - src: "osp/{{ redhat_osp_version }}/undercloud/instackenv.json.j2"
           dest: "/home/stack/instackenv.json"
           mode: "0644"
         - src: "osp/{{ redhat_osp_version }}/undercloud/undercloud_post_install_osp.sh.j2"
           dest: "/home/stack/scripts/undercloud-post-install.sh"
           mode: "0754"
+        - src: "osp/{{ redhat_osp_version }}/undercloud/undercloud_ssl_camap.yaml.j2"
+          dest: "/home/stack/templates/undercloud_ssl_camap.yaml"
+          mode: "0644"
 
     - name: Undercloud deploy - tail -f /home/stack/logs/undercloud_install.log to view progress
       shell: |
@@ -181,8 +184,11 @@
           dest: "/home/stack/templates/rhel-registration/environment-rhel-registration.yaml"
           mode: "0644"
         - src: "osp/{{ redhat_osp_version }}/overcloud/overcloud-deploy.sh.j2"
-          dest: "/home/stack/overcloud-deploy.sh"
+          dest: "/home/stack/scripts/overcloud-deploy.sh"
           mode: "0744"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/ceph-custom-config.yaml.j2"
+          dest: "/home/stack/templates/ceph-custom-config.yaml"
+          mode: "0644"
 
     - name: Introspect servers
       shell: |
@@ -193,5 +199,5 @@
     - name: Overcloud deploy - tail -f /home/stack/logs/overcloud_install.log to view progress
       shell: bash overcloud-deploy.sh
       args:
-        chdir: /home/stack
+        chdir: /home/stack/scripts
       become_user: stack

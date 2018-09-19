@@ -102,3 +102,7 @@ osa_enable_network: true
 osa_enable_meter: true
 osa_enable_object_storage: true
 osa_disable_serial: false
+
+# Ceph
+enable_ceph_storage: false
+ceph_journal_size: 5120
