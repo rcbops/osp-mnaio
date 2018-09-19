@@ -2,8 +2,12 @@ parameter_defaults:
   OvercloudControllerFlavor: control
   OvercloudComputeFlavor: compute
   OvercloudCephStorageFlavor: ceph-storage
+  OvercloudSwiftStorageFlavor: swift-storage
   ControllerCount: 3
   ComputeCount: 2
 {% if enable_ceph_storage | bool %}
   CephStorageCount: 3
+{% endif %}
+{% if enable_swift_storage | bool %}
+  ObjectStorageCount: 3
 {% endif %}

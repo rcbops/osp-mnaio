@@ -40,6 +40,20 @@
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
 
+    - name: Delete Swift VM Data LVs
+      lvol:
+        vg: vg01
+        lv: "{{ hostvars[item[0]]['server_hostname'] }}-{{ item[1] }}"
+        size: 4G
+        state: absent
+        force: yes
+      when:
+        - enable_swift_storage | default(false) | bool
+        - hostvars[item[0]]['server_vm'] | default(false) | bool
+      with_nested:
+        - "{{ groups['swift_hosts'] }}"
+        - [ 'disk1', 'disk2', 'disk3' ]
+
     - name: Delete Ceph VM Data LVs
       lvol:
         vg: vg01
@@ -52,7 +66,7 @@
         - hostvars[item[0]]['server_vm'] | default(false) | bool
       with_nested:
         - "{{ groups['ceph_hosts'] }}"
-        - [ 'disk1', 'disk2', 'disk3', 'disk4', 'disk5', 'disk6', 'disk7', 'disk8' ]
+        - [ 'disk1', 'disk2', 'disk3', 'disk4' ]
 
     - name: Delete VM LV
       lvol:
@@ -102,7 +116,19 @@
         - hostvars[item[0]]['server_vm'] | default(false) | bool
       with_nested:
         - "{{ groups['ceph_hosts'] }}"
-        - [ 'disk1', 'disk2', 'disk3', 'disk4', 'disk5', 'disk6', 'disk7', 'disk8' ]
+        - [ 'disk1', 'disk2', 'disk3', 'disk4' ]
+
+    - name: Create Swift VM Data LVs
+      lvol:
+        vg: vg01
+        lv: "{{ hostvars[item[0]]['server_hostname'] }}-{{ item[1] }}"
+        size: 4G
+      when:
+        - enable_swift_storage | default(false) | bool
+        - hostvars[item[0]]['server_vm'] | default(false) | bool
+      with_nested:
+        - "{{ groups['swift_hosts'] }}"
+        - [ 'disk1', 'disk2', 'disk3' ]
 
     - name: Setup file-based disk images
       when:
@@ -183,16 +209,33 @@
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
 
+    - name: Reset VirtualBMC sessions
+      file:
+        path: /root/.vbmc
+        state: absent
+
+    - name: Get running vbmc processes
+      shell: "ps -ef | grep -v grep | grep vbmc | awk '{print $2}'"
+      register: running_processes
+
+    - name: Force kill stuck vbmc processes
+      shell: "kill -9 {{ item }}"
+      with_items: "{{ running_processes.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Start VirtualBMC daemon
+      shell: vbmcd; vbmc list
+      failed_when: false
+
     - name: Setup VirtualBMC for each VM for Undercloud to use
       shell: |
-        vbmc stop {{ hostvars[item]['server_hostname'] }}
-        vbmc delete {{ hostvars[item]['server_hostname'] }}
         vbmc add {{ hostvars[item]['server_hostname'] }}  --username root --password secrete --address {{ mnaio_host_networks.dhcp.address | ipaddr('address') }} --port {{ hostvars[item]['server_virtual_bmc_port'] }}
         vbmc start {{ hostvars[item]['server_hostname'] }}
       failed_when: false
       when:
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
+
 
 - name: Check VM Connectivity
   import_playbook: vm-status.yml

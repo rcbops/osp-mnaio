@@ -41,6 +41,7 @@ ansible-playbook -vv \
                  -e compute_vm_server_ram=${COMPUTE_VM_SERVER_RAM:-"8196"} \
                  -e controller_vm_server_ram=${CONTROLLER_VM_SERVER_RAM:-"16384"} \
                  -e director_vm_server_ram=${DIRECTOR_VM_SERVER_RAM:-"16384"} \
+                 -e swift_vm_server_ram=${SWIFT_VM_SERVER_RAM:-"4096"} \
                  -e director_vm_server_vcpus=${DIRECTOR_VM_SERVER_VCPUS:-"8"} \
                  -e ipxe_kernel_url=${IPXE_KERNEL_URL:-"http://boot.ipxe.org/ipxe.lkrn"} \
                  -e redhat_iso_url=${REDHAT_ISO_URL:-""} \
@@ -52,8 +53,10 @@ ansible-playbook -vv \
                  -e redhat_osp_version=${REDHAT_OSP_VERSION:-"13"} \
                  -e redhat_overcloud_register=${REDHAT_OVERCLOUD_REGISTER:-'false'} \
                  -e enable_ceph_storage=${ENABLE_CEPH_STORAGE:-"true"} \
+                 -e enable_ceph_rgw=${ENABLE_CEPH_RGW:-"false"} \
                  -e ceph_osds_size=${ceph_osds_size:-"20480"} \
                  -e ceph_journal_size=${CEPH_JOURNAL_SIZE:-"5120"} \
+                 -e enable_swift_storage=${ENABLE_SWIFT_STORAGE:-"true"} \
                  -e ipxe_path_url=${IPXE_PATH_URL:-""} ${MNAIO_ANSIBLE_PARAMETERS} \
                  --force-handlers \
                  --flush-cache \
