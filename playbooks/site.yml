@@ -40,3 +40,7 @@
 - import_playbook: deploy-osp.yml
   when:
     - deploy_osp | default(true) | bool
+
+- import_playbook: test-osp.yml
+  when:
+    - test_osp | default(true) | bool

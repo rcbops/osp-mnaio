@@ -1,0 +1,106 @@
+#!/bin/bash
+
+set -euvx -o pipefail
+
+TEMPEST_PACKAGES="${TEMPEST_PACKAGES:-openstack-tempest}"
+TEMPEST_OPTIONS="${TEMPEST_OPTIONS:---concurrency 1}"
+TEMPEST_TESTS="${TEMPEST_TESTS:-{{ tempest_tests }}}"
+TEMPESTCONF_OPTIONS="${TEMPESTCONF_OPTIONS:-compute.build_timeout 600 \
+                                            volume.build_timeout 600 \
+                                            network.build_timeout 600}"
+
+# Start in user's, presumably "stack", home directory.
+cd "${HOME}"
+
+# Install Tempest.
+sudo yum --assumeyes install ${TEMPEST_PACKAGES}
+
+# Backup previous Tempest workspace.
+if [ -d tempest ]; then
+  tempest workspace remove --name tempest || true
+  mv tempest tempest-$(date -r tempest +%Y-%m-%d_%H:%M:%S%:z)
+fi
+
+# Read overcloud client configuration.
+set +vx
+source overcloudrc
+set -vx
+
+# Create provider networking.
+openstack network create public \
+  --external \
+  --provider-network-type flat \
+  --provider-physical-network datacentre
+openstack subnet create ext-subnet \
+  --allocation-pool start=192.168.24.100,end=192.168.24.120 \
+  --no-dhcp \
+  --gateway 192.168.24.1 \
+  --network public \
+  --subnet-range 192.168.24.0/24
+
+# Configure Tempest.
+tempest init tempest
+cd tempest
+NETWORK_PUBLIC_ID=$(openstack network show public -f value -c id)
+discover-tempest-config --create \
+  --debug \
+  --deployer-input ~/tempest-deployer-input.conf \
+  --network-id ${NETWORK_PUBLIC_ID} \
+  identity.uri ${OS_AUTH_URL} \
+  identity.admin_password ${OS_PASSWORD} \
+  ${TEMPESTCONF_OPTIONS}
+# Work around Tempest bug by tweaking Tempest config file.
+# Bug report: https://bugzilla.redhat.com/1624906
+# Bug fix: https://github.com/openstack/tempest/commit/d7e05dd7
+sed -i~ 's|^\(api_extensions = *\)$|#\1|' etc/tempest.conf
+tempest verify-config
+tempest cleanup --init-saved-state
+
+# Run Tempest tests.
+tempest run ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} || RC=${?}
+
+# Tell Tempest to clean up after itself, including tempestconf creations.
+tempest cleanup --delete-tempest-conf-objects
+
+# Delete what tempestconf created, ie `discover-tempest-config --create --debug
+# | grep Creating`, and `tempest cleanup`, even with
+# `--delete-tempest-conf-objects`, doesn't clean up usually.
+TYPE=(user project user project flavor flavor image image)
+NAME=(demo demo alt_demo alt_demo m1.{nano,micro} \
+      cirros-0.3.5-x86_64-disk.img{,_alt})
+for INDEX in ${!TYPE[*]}; do
+  if openstack "${TYPE[${INDEX}]}" show "${NAME[${INDEX}]}" >/dev/null; then
+    openstack "${TYPE[${INDEX}]}" delete "${NAME[${INDEX}]}"
+  fi
+done
+
+# Delete networking that Tempest and we created.
+# Delete floating IPs.
+for FLOATING_IP_ID in $(openstack floating ip list -c ID -f value ); do
+  openstack floating ip unset --port ${FLOATING_IP_ID}
+  openstack floating ip delete ${FLOATING_IP_ID}
+done
+# Delete routers.
+for ROUTER_ID in $(openstack router list -c ID -f value); do
+  openstack router unset --external-gateway ${ROUTER_ID}
+  for PORT_ID in $(openstack port list --router ${ROUTER_ID} -c ID -f value)
+  do
+    openstack router remove port ${ROUTER_ID} ${PORT_ID}
+  done
+  openstack router set --disable ${ROUTER_ID}
+  openstack router delete ${ROUTER_ID}
+done
+# Delete ports.
+for PORT_ID in $(openstack port list -c ID -f value); do
+  openstack port delete ${PORT_ID}
+done
+# Delete subnets.
+for SUBNET_ID in $(openstack subnet list -c ID -f value ); do
+  openstack subnet delete ${SUBNET_ID}
+done
+# Delete networks.
+for NETWORK_ID in $(openstack network list -c ID -f value); do
+  openstack network delete ${NETWORK_ID}
+done
+
+exit ${RC:-0}
