@@ -158,7 +158,7 @@
       shell: |
         set -o pipefail
         /home/stack/scripts/undercloud-post-install.sh \
-        2>&1 | tee /home/stack/logs/undercloud_post_install_log
+        2>&1 | tee /home/stack/logs/undercloud_post_install.log
       become: true
       become_user: stack
 
