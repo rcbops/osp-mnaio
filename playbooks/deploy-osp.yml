@@ -197,7 +197,7 @@
       become_user: stack
 
     - name: Overcloud deploy - tail -f /home/stack/logs/overcloud_install.log to view progress
-      shell: bash overcloud-deploy.sh
+      shell: bash scripts/overcloud-deploy.sh
       args:
-        chdir: /home/stack/scripts
+        chdir: /home/stack
       become_user: stack
