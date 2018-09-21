@@ -15,10 +15,13 @@ openstack overcloud deploy --templates \
 {% endif %}
 {% if enable_ceph_storage | bool %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+   -e /home/stack/templates/ceph-custom-config.yaml \
 {% if enable_ceph_rgw | bool %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-rgw.yaml \
 {% endif %}
-   -e /home/stack/templates/ceph-custom-config.yaml \
+{% endif %}
+{% if enable_octavia | bool %}
+   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/octavia.yaml \
 {% endif %}
    --ntp-server pool.ntp.org \
    2>&1 | tee /home/stack/logs/overcloud_install.log

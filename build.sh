@@ -59,6 +59,7 @@ ansible-playbook -vv \
                  -e ceph_osds_size=${ceph_osds_size:-"20480"} \
                  -e ceph_journal_size=${CEPH_JOURNAL_SIZE:-"5120"} \
                  -e enable_swift_storage=${ENABLE_SWIFT_STORAGE:-"false"} \
+                 -e enable_octavia=${ENABLE_OCTAVIA:-"true"} \
                  -e ipxe_path_url=${IPXE_PATH_URL:-""} ${MNAIO_ANSIBLE_PARAMETERS} \
                  --force-handlers \
                  --flush-cache \
