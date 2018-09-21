@@ -6,7 +6,7 @@
             ],
             "name":"controller1",
             "cpu":"4",
-            "memory":"8192",
+            "memory":"{{ controller_vm_server_ram }}",
             "disk":"90",
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
@@ -22,7 +22,7 @@
             ],
             "name":"controller2",
             "cpu":"4",
-            "memory":"8192",
+            "memory":"{{ controller_vm_server_ram }}",
             "disk":"90",
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
@@ -38,7 +38,7 @@
             ],
             "name":"controller3",
             "cpu":"4",
-            "memory":"8192",
+            "memory":"{{ controller_vm_server_ram }}",
             "disk":"90",
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
@@ -54,7 +54,7 @@
             ],
             "name":"compute1",
             "cpu":"4",
-            "memory":"8192",
+            "memory":"{{ compute_vm_server_ram }}",
             "disk":"90",
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
@@ -70,7 +70,7 @@
             ],
             "name":"compute2",
             "cpu":"4",
-            "memory":"8192",
+            "memory":"{{ compute_vm_server_ram }}",
             "disk":"90",
             "arch":"x86_64",
             "pm_type":"pxe_ipmitool",
@@ -87,7 +87,7 @@
             ],
             "name":"ceph1",
             "cpu":"2",
-            "memory":"2048",
+            "memory":"{{ ceph_vm_server_ram }}",
             "disk":"90",
             "root_device": {
                "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
@@ -106,7 +106,7 @@
             ],
             "name":"ceph2",
             "cpu":"2",
-            "memory":"2048",
+            "memory":"{{ ceph_vm_server_ram }}",
             "disk":"90",
             "root_device": {
                "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
@@ -125,7 +125,7 @@
             ],
             "name":"ceph3",
             "cpu":"2",
-            "memory":"2048",
+            "memory":"{{ ceph_vm_server_ram }}",
             "disk":"90",
             "root_device": {
                "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
@@ -137,6 +137,65 @@
             "pm_addr":"192.168.24.254",
             "pm_port": "631",
             "capabilities": "profile:ceph-storage,boot_option:local"
+{% endif %}
+{% if enable_swift_storage | bool %}
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:10"
+            ],
+            "name":"swift1",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
+            "arch":"x86_64",
+            "pm_type":"pxe_ipmitool",
+            "pm_user":"root",
+            "pm_password":"secrete",
+            "pm_addr":"192.168.24.254",
+            "pm_port": "632",
+            "capabilities": "profile:swift-storage,boot_option:local"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:11"
+            ],
+            "name":"swift2",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
+            "arch":"x86_64",
+            "pm_type":"pxe_ipmitool",
+            "pm_user":"root",
+            "pm_password":"secrete",
+            "pm_addr":"192.168.24.254",
+            "pm_port": "633",
+            "capabilities": "profile:swift-storage,boot_option:local"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:12"
+            ],
+            "name":"swift3",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "root_device": {
+               "by_path":"/dev/disk/by-path/pci-0000:00:09.0"
+                },
+            "arch":"x86_64",
+            "pm_type":"pxe_ipmitool",
+            "pm_user":"root",
+            "pm_password":"secrete",
+            "pm_addr":"192.168.24.254",
+            "pm_port": "634",
+            "capabilities": "profile:swift-storage,boot_option:local"
         }
 {% else %}
         }

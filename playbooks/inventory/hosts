@@ -16,6 +16,9 @@ ceph2            ansible_host=10.0.236.131
 ceph3            ansible_host=10.0.236.132
 compute1         ansible_host=10.0.236.120
 compute2         ansible_host=10.0.236.121
+swift1           ansible_host=10.0.236.140
+swift2           ansible_host=10.0.236.141
+swift3           ansible_host=10.0.236.142
 
 ################################# MNAIO HOSTS #################################
 
@@ -54,11 +57,19 @@ director
 controller1
 controller2
 controller3
+swift1
+swift2
+swift3
 
 [ceph_hosts]
 ceph1
 ceph2
 ceph3
+
+[swift_hosts]
+swift1
+swift2
+swift3
 
 ################################## OSA HOSTS ##################################
 
