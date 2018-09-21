@@ -76,6 +76,15 @@ the following, currently false by default:
 
     export REDHAT_OVERCLOUD_REGISTER="true"
 
+By default Ceph is installed as the preferred storage.  If you also want to deploy
+Swift, enable Swift to provision Object Storage nodes.  OSP doesn't setup the rings
+on the scaled out nodes by default so you may need to do some addtional steps:
+(https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/deploy_swift.html)
+
+.. code-block:: bash
+
+    export ENABLE_SWIFT_STORAGE="true"
+
 When your ready, run the build script by executing ``bash ./build.sh``. The
 build script current executes a kickstart deployment of RHEL OSP Director,
 creates the undercloud and overcloud.
