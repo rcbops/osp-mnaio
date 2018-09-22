@@ -20,5 +20,8 @@ openstack overcloud deploy --templates \
 {% endif %}
    -e /home/stack/templates/ceph-custom-config.yaml \
 {% endif %}
+{% if enable_sahara | bool %}
+   -e /usr/share/openstack-tripleo-heat-templates/environments/services/sahara.yaml \
+{% endif %}
    --ntp-server pool.ntp.org \
    2>&1 | tee /home/stack/logs/overcloud_install.log
