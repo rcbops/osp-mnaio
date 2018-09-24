@@ -35,7 +35,9 @@ openstack overcloud container image prepare \
 {% endif %}
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/sahara.yaml \
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/manila.yaml \
+{% if enable_octavia | bool %}
   -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/octavia.yaml \
+{% endif %}
 {% if enable_ceph_storage | bool %}
   -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
   --set ceph_namespace=registry.access.redhat.com/rhceph \
