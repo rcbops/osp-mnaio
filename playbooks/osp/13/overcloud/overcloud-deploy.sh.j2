@@ -16,6 +16,7 @@ openstack overcloud deploy --templates \
 {% if enable_ceph_storage | bool %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
    -e /home/stack/templates/ceph-custom-config.yaml \
+   -e /home/stack/templates/storage-environment.yaml \
 {% if enable_ceph_rgw | bool %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-rgw.yaml \
 {% endif %}
