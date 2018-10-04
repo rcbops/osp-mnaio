@@ -55,7 +55,7 @@ ansible-playbook -vv \
                  -e redhat_osp_version=${REDHAT_OSP_VERSION:-"13"} \
                  -e redhat_overcloud_register=${REDHAT_OVERCLOUD_REGISTER:-'false'} \
                  -e enable_ceph_storage=${ENABLE_CEPH_STORAGE:-"true"} \
-                 -e enable_ceph_rgw=${ENABLE_CEPH_RGW:-"false"} \
+                 -e enable_ceph_rgw=${ENABLE_CEPH_RGW:-"true"} \
                  -e ceph_osds_size=${ceph_osds_size:-"20480"} \
                  -e ceph_journal_size=${CEPH_JOURNAL_SIZE:-"5120"} \
                  -e enable_swift_storage=${ENABLE_SWIFT_STORAGE:-"false"} \

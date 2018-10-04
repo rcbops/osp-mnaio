@@ -52,6 +52,14 @@
         - rhel-ha-for-rhel-7-server-rpms
         - rhel-7-server-openstack-{{ redhat_osp_version }}-rpms
 
+    - name: Enable Ceph Repos
+      rhsm_repository:
+        name: "{{ item }}"
+        state: enabled
+      with_items:
+        - rhel-7-server-rhceph-3-tools-rpms
+      when: enable_ceph_storage | bool
+
     - name: Creating directories for the undercloud
       file:
         path: "/home/stack/{{ item }}"
