@@ -34,7 +34,6 @@
         - name: Wait for VM
           wait_for_connection:
             connect_timeout: 10
-            port: 22
             sleep: 20
             timeout: "{{ vm_ssh_timeout }}"
       rescue:
@@ -58,7 +57,6 @@
         - name: Wait for VM (rescue)
           wait_for_connection:
             connect_timeout: 10
-            port: 22
             sleep: 20
             timeout: "{{ vm_ssh_timeout }}"
           register: vm_rescue
