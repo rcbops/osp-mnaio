@@ -29,6 +29,21 @@ set -exu
 
 source "$(readlink -f $(dirname ${0}))/../env_vars"
 
+if [ "${OSP_JOB_ACTION}" = "deploy-smoke-tests" ]; then
+    export TEMPEST_TESTS='--smoke'
+elif [ "${OSP_JOB_ACTION}" = "deploy-full-tests" ]; then
+    # NOTE(coreywright): Explicitly specify the regex that matches all tests.
+    # Technically executing Tempest without specifying any tests causes it to
+    # run all tests, but between our use of an env var and Bash not always
+    # distinguishing between an env var that's unset and one that's set to
+    # null, explicitly specify all tests so the default test regex in build.sh
+    # doesn't get used.
+    export TEMPEST_TESTS='--regex ^.*$'
+else
+    echo "ERROR: unhandled OSP_JOB_ACTION value: \"${OSP_JOB_ACTION}\""
+    exit 1
+fi
+
 # start the osp-mnaio build
 pushd /opt/osp-mnaio
   ./build.sh
