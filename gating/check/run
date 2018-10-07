@@ -27,7 +27,7 @@
 
 set -exu
 
-source "$(readlink -f $(dirname ${0}))/env_vars"
+source "$(readlink -f $(dirname ${0}))/../env_vars"
 
 # start the osp-mnaio build
 pushd /opt/osp-mnaio
