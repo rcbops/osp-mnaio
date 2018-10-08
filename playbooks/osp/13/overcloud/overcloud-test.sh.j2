@@ -58,6 +58,12 @@ discover-tempest-config --create \
 sed -i~ 's|^\(api_extensions = *\)$|#\1|' etc/tempest.conf
 tempest cleanup --init-saved-state
 
+# List and count Tempest tests.
+tempest run --list-tests ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} \
+| sort \
+| tee /dev/stderr \
+| wc -l
+
 # Run Tempest tests.
 tempest run ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} || RC=${?}
 
