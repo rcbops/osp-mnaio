@@ -74,19 +74,18 @@
 
     - name: Installing helpful tools and packages
       yum:
-        pkg: "{{ item }}"
+        pkg:
+          - ntp
+          - tcpdump
+          - policycoreutils-python
+          - sysstat
+          - rsync
+          - tuned
+          - tmux
+          - wget
+          - net-tools
+          - libguestfs-tools
         state: installed
-      with_items:
-        - ntp
-        - tcpdump
-        - policycoreutils-python
-        - sysstat
-        - rsync
-        - tuned
-        - tmux
-        - wget
-        - net-tools
-        - libguestfs-tools
 
     - name: Validating ntpd is running and enabled
       service:
@@ -112,11 +111,10 @@
 
     - name: Installing tripleo client packages
       yum:
-        pkg: "{{ item }}"
+        pkg:
+          - python-tripleoclient
+          - ceph-ansible
         state: installed
-      with_items:
-       - python-tripleoclient
-       - ceph-ansible
 
     - name: Setting up undercloud configurations
       template:
@@ -148,11 +146,10 @@
 
     - name: Installing Red Hat undercloud images
       yum:
-        pkg: "{{ item }}"
+        pkg:
+          - rhosp-director-images
+          - rhosp-director-images-ipa
         state: installed
-      with_items:
-        - rhosp-director-images
-        - rhosp-director-images-ipa
 
     - name: Create images, import inventory, attach images, tag nodes, create container registry
       shell: |
