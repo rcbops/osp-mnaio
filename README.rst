@@ -1,4 +1,4 @@
-Red Hat OSP Multi-Node AIO
+ed Hat OSP Multi-Node AIO
 ################################
 :date: 2018-08-03
 :tags: rackspace, openstack, osp, redhat
