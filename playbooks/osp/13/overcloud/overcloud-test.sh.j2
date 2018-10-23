@@ -5,12 +5,16 @@ set -euvx -o pipefail
 TEMPEST_PACKAGES="${TEMPEST_PACKAGES:-openstack-tempest}"
 TEMPEST_OPTIONS="${TEMPEST_OPTIONS:---concurrency 1}"
 TEMPEST_TESTS="${TEMPEST_TESTS:-{{ tempest_tests }}}"
-TEMPESTCONF_OPTIONS="${TEMPESTCONF_OPTIONS:-compute.build_timeout 600 \
+TEMPESTCONF_OPTIONS="${TEMPESTCONF_OPTIONS:- \
+  object-storage.operator_role Member \
+  compute.build_timeout 600 \
+  volume.build_timeout 600 \
+  network.build_timeout 600 \
+  image.build_timeout 600 \
 {% if enable_ceph_storage | bool %}
-                                            object-storage-feature-enabled.discoverability false \
+  object-storage-feature-enabled.discoverability false \
 {% endif %}
-                                            volume.build_timeout 600 \
-                                            network.build_timeout 600}"
+}"
 
 # Start in user's, presumably "stack", home directory.
 cd "${HOME}"
