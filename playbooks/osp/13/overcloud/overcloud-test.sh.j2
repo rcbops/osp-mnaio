@@ -68,6 +68,12 @@ tempest run --list-tests ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} \
 tempest run ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} || RC=${?}
 RC=${RC:-0}
 
+# If Tempest encounters a critical error (ie Python TypeError), then it can
+# incorrectly report success when prematurely exiting.
+if [ "${RC}" = 0 ] && grep -E ' [0-9]+ CRITICAL tempest ' tempest.log; then
+  RC=1
+fi
+
 # Tell Tempest to clean up after itself, including tempestconf creations.
 tempest cleanup --delete-tempest-conf-objects
 
