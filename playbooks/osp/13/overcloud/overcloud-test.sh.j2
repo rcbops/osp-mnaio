@@ -84,7 +84,7 @@ done
 
 # Delete networking that Tempest and we created.
 # Delete floating IPs.
-for FLOATING_IP_ID in $(openstack floating ip list -c ID -f value ); do
+for FLOATING_IP_ID in $(openstack floating ip list -c ID -f value); do
   openstack floating ip unset --port ${FLOATING_IP_ID}
   openstack floating ip delete ${FLOATING_IP_ID}
 done
@@ -103,7 +103,7 @@ for PORT_ID in $(openstack port list -c ID -f value); do
   openstack port delete ${PORT_ID}
 done
 # Delete subnets.
-for SUBNET_ID in $(openstack subnet list -c ID -f value ); do
+for SUBNET_ID in $(openstack subnet list -c ID -f value); do
   openstack subnet delete ${SUBNET_ID}
 done
 # Delete networks.
