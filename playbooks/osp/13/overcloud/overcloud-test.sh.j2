@@ -3,6 +3,8 @@
 set -euvx -o pipefail
 
 TEMPEST_PACKAGES="${TEMPEST_PACKAGES:-openstack-tempest}"
+# Run one test at a time so as to not cause artificial failures from
+# overwhelming the smallish environment.
 TEMPEST_OPTIONS="${TEMPEST_OPTIONS:---concurrency 1}"
 TEMPEST_TESTS="${TEMPEST_TESTS:-{{ tempest_tests }}}"
 TEMPESTCONF_OPTIONS="${TEMPESTCONF_OPTIONS:- \
@@ -67,6 +69,8 @@ discover-tempest-config --create \
 #  fi
 #fi
 
+# Have Tempest make note of what exists in the cloud so it can delete
+# everything else it generates while, and leaves behind after, running tests.
 tempest cleanup --init-saved-state
 
 # List and count Tempest tests.
