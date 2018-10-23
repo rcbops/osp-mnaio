@@ -96,6 +96,17 @@ for INDEX in ${!TYPE[*]}; do
   fi
 done
 
+# Delete abandoned security groups, ie security groups belonging to a project
+# that does not exist, ignoring the default security group that doesn't belong
+# to a project.
+openstack security group list -f csv --quote none -c ID -c Project \
+| tail -n+2 | grep -v ,$ | tr , ' ' \
+| while read SG_ID PROJ_ID; do
+  if ! openstack project show ${PROJ_ID} >/dev/null; then
+    openstack security group delete ${SG_ID}
+  fi
+done
+
 # Delete networking that Tempest and we created.
 # Delete floating IPs.
 for FLOATING_IP_ID in $(openstack floating ip list -c ID -f value); do
