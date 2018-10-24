@@ -45,6 +45,14 @@ ara generate html ${RESULTS_DIR}/ara/
 # grab deploy logs from director
 scp -p stack@director:/home/stack/logs/*.log ${RESULTS_DIR}/director/
 
+# grab instack log from director
+scp -p stack@director:/home/stack/.instack/install-undercloud.log \
+       ${RESULTS_DIR}/director/instack-install-undercloud.log
+
+# grab tempest log from director
+scp -p stack@director:/home/stack/tempest/tempest.log \
+       ${RESULTS_DIR}/director/
+
 # grab OpenStack service logs from overcloud nodes
 pushd /opt/osp-mnaio
   ansible-playbook -i playbooks/inventory/hosts playbooks/collect-logs.yml \
