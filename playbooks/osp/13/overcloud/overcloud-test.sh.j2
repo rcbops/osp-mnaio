@@ -66,6 +66,7 @@ tempest run --list-tests ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} \
 
 # Run Tempest tests.
 tempest run ${TEMPEST_OPTIONS} ${TEMPEST_TESTS} || RC=${?}
+RC=${RC:-0}
 
 # Tell Tempest to clean up after itself, including tempestconf creations.
 tempest cleanup --delete-tempest-conf-objects
@@ -111,4 +112,4 @@ for NETWORK_ID in $(openstack network list -c ID -f value); do
   openstack network delete ${NETWORK_ID}
 done
 
-exit ${RC:-0}
+exit ${RC}
