@@ -59,3 +59,8 @@ pushd /opt/osp-mnaio
                    -e redhat_osp_version=${REDHAT_OSP_VERSION} \
                    -e log_dir=${RESULTS_DIR}
 popd
+
+# rename log file extension from "log" to "txt", as "txt" maps to a recognized
+# MIME type, for viewing within the browser in the web-based artifact interface
+find ${RESULTS_DIR} -type f -name '*.log' \
+     -exec bash -c 'mv -v "${1}" "${1/%.log/.txt}"' - '{}' \;
