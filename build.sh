@@ -33,7 +33,7 @@ ansible-playbook -vv \
                  -e setup_dhcpd=${SETUP_DHCPD:-"true"} \
                  -e deploy_vms=${DEPLOY_VMS:-"true"} \
                  -e test_osp=${TEST_OSP:-"true"} \
-                 -e "tempest_tests=\"${TEMPEST_TESTS:-"--regex ^tempest.scenario.test_[^_]+_basic_ops.*smoke"}\"" \
+                 -e "tempest_tests=\"${TEMPEST_TESTS:-"--regex ^tempest.scenario.test_[^_]+_basic_ops.*smoke --blacklist-file /home/stack/tempest-blacklist.txt"}\"" \
                  -e default_network=${DEFAULT_NETWORK:-"eth0"} \
                  -e default_image=${DEFAULT_IMAGE:-"rhel-7.5-amd64"} \
                  -e vm_disk_size=${VM_DISK_SIZE:-92160} \

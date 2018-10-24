@@ -53,6 +53,10 @@ scp -p stack@director:/home/stack/.instack/install-undercloud.log \
 scp -p stack@director:/home/stack/tempest/tempest.log \
        ${RESULTS_DIR}/director/
 
+# grab tempest blacklist from director
+scp -p stack@director:/home/stack/tempest-blacklist.txt \
+       ${RESULTS_DIR}/director/
+
 # grab OpenStack service logs from overcloud nodes
 pushd /opt/osp-mnaio
   ansible-playbook -i playbooks/inventory/hosts playbooks/collect-logs.yml \
