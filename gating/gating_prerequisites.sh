@@ -1,3 +1,4 @@
+#!/bin/bash
 # Save a backup of the original file
 if [[ ! -e /etc/apt/sources.list.original ]]; then
   mv /etc/apt/sources.list /etc/apt/sources.list.original
