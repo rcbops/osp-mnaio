@@ -52,16 +52,16 @@ ansible-playbook -vv \
                  -e redhat_password=${REDHAT_PASSWORD:-""} \
                  -e redhat_consumer_name=${REDHAT_CONSUMER_NAME:-""} \
                  -e redhat_pool_id=${REDHAT_POOL_ID:-""} \
-                 -e redhat_osp_version=${REDHAT_OSP_VERSION:-"13"} \
+                 -e redhat_osp_version="12" \
                  -e redhat_overcloud_register=${REDHAT_OVERCLOUD_REGISTER:-'false'} \
-                 -e enable_ceph_storage=${ENABLE_CEPH_STORAGE:-"true"} \
-                 -e enable_ceph_rgw=${ENABLE_CEPH_RGW:-"true"} \
+                 -e enable_ceph_storage="false" \
+                 -e enable_ceph_rgw="false" \
                  -e ceph_osds_size=${ceph_osds_size:-"20480"} \
                  -e ceph_journal_size=${CEPH_JOURNAL_SIZE:-"5120"} \
-                 -e enable_swift_storage=${ENABLE_SWIFT_STORAGE:-"false"} \
-                 -e enable_octavia=${ENABLE_OCTAVIA:-"true"} \
-                 -e enable_sahara=${ENABLE_SAHARA:-"true"} \
-                 -e enable_manila=${ENABLE_MANILA:-"true"} \
+                 -e enable_swift_storage="false" \
+                 -e enable_octavia="false" \
+                 -e enable_sahara="false" \
+                 -e enable_manila="false" \
                  -e ipxe_path_url=${IPXE_PATH_URL:-""} ${MNAIO_ANSIBLE_PARAMETERS} \
                  --force-handlers \
                  --flush-cache \
