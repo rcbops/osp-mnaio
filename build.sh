@@ -62,6 +62,7 @@ ansible-playbook -vv \
                  -e enable_octavia=${ENABLE_OCTAVIA:-"true"} \
                  -e enable_sahara=${ENABLE_SAHARA:-"true"} \
                  -e enable_manila=${ENABLE_MANILA:-"true"} \
+                 -e enable_barbican=${ENABLE_BARBICAN:-"true"} \
                  -e ipxe_path_url=${IPXE_PATH_URL:-""} ${MNAIO_ANSIBLE_PARAMETERS} \
                  --force-handlers \
                  --flush-cache \

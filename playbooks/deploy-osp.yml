@@ -200,6 +200,9 @@
         - src: "osp/{{ redhat_osp_version }}/overcloud/storage-environment.yaml.j2"
           dest: "/home/stack/templates/storage-environment.yaml"
           mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/configure-barbican.yaml.j2"
+          dest: "/home/stack/templates/configure-barbican.yaml"
+          mode: "0644"
 
     - name: Introspect servers
       shell: |

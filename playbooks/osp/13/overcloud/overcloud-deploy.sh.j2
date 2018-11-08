@@ -7,7 +7,6 @@ set -evx
 source /home/stack/stackrc
 openstack overcloud deploy --templates \
    -e /home/stack/templates/node-info.yaml \
-   -e /home/stack/templates/overcloud_images.yaml \
    -e /home/stack/templates/undercloud_ssl_camap.yaml \
 {% if redhat_overcloud_register | bool %}
    -e /home/stack/templates/rhel-registration/environment-rhel-registration.yaml \
@@ -31,6 +30,14 @@ openstack overcloud deploy --templates \
    -e /usr/share/openstack-tripleo-heat-templates/environments/manila-cephfsnative-config.yaml \
    -e /usr/share/openstack-tripleo-heat-templates/environments/services/ceph-mds.yaml \
    -e /home/stack/templates/manila-cephfsnative-config.yaml \
+{% endif %}
+{% if enable_barbican | bool %}
+   -e /usr/share/openstack-tripleo-heat-templates/environments/services/barbican.yaml \
+   -e /usr/share/openstack-tripleo-heat-templates/environments/barbican-backend-simple-crypto.yaml \
+   -e /home/stack/templates/configure-barbican.yaml \
+   -e /home/stack/templates/container-parameters-with-barbican.yaml \
+{% else %}
+   -e /home/stack/templates/overcloud_images.yaml \
 {% endif %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/neutron-ovn-ha.yaml \
    --ntp-server pool.ntp.org \
