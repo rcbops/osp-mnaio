@@ -20,11 +20,17 @@ openstack overcloud image upload --update-existing
 # Import inventory
 openstack overcloud node import /home/stack/instackenv.json
 
-# Associate images to nodes
-#openstack baremetal configure boot
+# copy undercloud cert into undercloud_ssl_camap yml for injection into control nodes
+sudo cat /etc/pki/tls/certs/undercloud-192.168.24.2.pem | sed 's/^/        /' >> /home/stack/templates/undercloud_ssl_camap.yaml
+sudo chown stack:stack /home/stack/templates/undercloud_ssl_camap.yaml
 
 # set dns servers
 openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 ctlplane-subnet
+
+# set root_disk to use the 90GB volume
+openstack baremetal node list | grep ceph1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property root_device='{"size":"90"}' '{}'
+openstack baremetal node list | grep ceph2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property root_device='{"size":"90"}' '{}'
+openstack baremetal node list | grep ceph3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property root_device='{"size":"90"}' '{}'
 
 # Configuring the Overcloud to Use the Undercloud as a Local Registry
 LATEST_IMAGE_TAG=`sudo openstack overcloud container image tag discover \
@@ -33,6 +39,11 @@ LATEST_IMAGE_TAG=`sudo openstack overcloud container image tag discover \
 
 openstack overcloud container image prepare \
 		  --namespace=registry.access.redhat.com/rhosp12 \
+{% if enable_ceph_storage | bool %}
+                  -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+                  --set ceph_namespace=registry.access.redhat.com/rhceph \
+                  --set ceph_image=rhceph-2-rhel7 \
+{% endif %}
 	          --prefix=openstack- \
 	          --tag=${LATEST_IMAGE_TAG} \
 	          --output-images-file /home/stack/local_registry_images.yaml

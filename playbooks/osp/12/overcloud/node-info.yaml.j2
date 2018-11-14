@@ -4,4 +4,6 @@ parameter_defaults:
   OvercloudCephStorageFlavor: ceph-storage
   ControllerCount: 3
   ComputeCount: 2
+{% if enable_ceph_storage | bool %}
   CephStorageCount: 3
+{% endif %}

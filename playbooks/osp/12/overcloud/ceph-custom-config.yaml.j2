@@ -1,0 +1,15 @@
+parameter_defaults:
+  CephAnsiblePlaybookVerbosity: 3
+  CephPoolDefaultSize: 3
+  CephPoolDefaultPgNum: 128
+  CephConfigOverrides:
+    journal_size: 5120
+    max_open_files: 131072
+    mon_max_pg_per_osd: 3072
+  CephAnsibleDisksConfig:
+    osd_scenario: collocated
+    devices:
+      - /dev/vdb
+      - /dev/vdc
+      - /dev/vdd
+      - /dev/vde
