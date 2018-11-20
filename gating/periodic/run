@@ -39,6 +39,8 @@ elif [ "${OSP_JOB_ACTION}" = "deploy-full-tests" ]; then
     # null, explicitly specify all tests so the default test regex in build.sh
     # doesn't get used.
     export TEMPEST_TESTS='--regex ^.*$ --blacklist-file /home/stack/tempest-blacklist.txt'
+elif [ "${OSP_JOB_ACTION}" = "deploy-system-tests" ]; then
+    export TEMPEST_TESTS=''
 else
     echo "ERROR: unhandled OSP_JOB_ACTION value: \"${OSP_JOB_ACTION}\""
     exit 1
@@ -48,3 +50,7 @@ fi
 pushd /opt/osp-mnaio
   ./build.sh
 popd
+
+if [ "${OSP_JOB_ACTION}" = "deploy-system-tests" ]; then
+    bash -c "$(readlink -f $(dirname ${0})/run_system_tests.sh)"
+fi
