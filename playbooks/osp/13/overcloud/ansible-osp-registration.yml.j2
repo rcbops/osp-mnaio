@@ -1,0 +1,33 @@
+---
+- name: Register OSP 13 repos on Nodes
+  hosts: Controller:Compute:CephStorage:SwiftStorage
+  become: yes
+  vars:
+    repos:
+      - rhel-7-server-rpms
+      - rhel-7-server-extras-rpms
+      - rhel-7-server-rh-common-rpms
+      - rhel-ha-for-rhel-7-server-rpms
+      - rhel-7-server-openstack-13-rpms
+  tasks:
+    - name: Register system
+      redhat_subscription:
+        username: "{{ redhat_username }}"
+        password: "{{ redhat_password }}"
+        pool_ids: "{{ redhat_pool_id }}"
+    - name: Disable all repos
+      command: "subscription-manager repos --disable *"
+    - name: Enable Controller node repos
+      command: "subscription-manager repos --enable {{ '{{' }} item {{ '}}' }}"
+      with_items: "{{ '{{' }} repos {{ '}}' }}"
+
+- name: Register Ceph Repos
+  hosts: Controller:CephStorage
+  become: yes
+  vars:
+    repos:
+      - rhel-7-server-rhceph-3-mon-rpms
+  tasks:
+    - name: Enable Ceph Repos on Controller and Ceph nodes
+      command: "subscription-manager repos --enable {{ '{{' }} item {{ '}}' }}"
+      with_items: "{{ '{{' }} repos {{ '}}' }}"
