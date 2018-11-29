@@ -167,13 +167,6 @@
       become: true
       become_user: stack
 
-    - name: Copy rhel-registration scripts to templates directory
-      synchronize:
-        src: /usr/share/openstack-tripleo-heat-templates/extraconfig/pre_deploy/rhel-registration
-        dest: /home/stack/templates/
-      delegate_to: "{{ inventory_hostname }}"
-      become_user: stack
-
     - name: Setting up overcloud configuations
       template:
         src: "{{ item.src }}"
@@ -185,8 +178,8 @@
         - src: "osp/{{ redhat_osp_version }}/overcloud/node-info.yaml.j2"
           dest: "/home/stack/templates/node-info.yaml"
           mode: "0644"
-        - src: "osp/{{ redhat_osp_version }}/overcloud/environment-rhel-registration.yaml.j2"
-          dest: "/home/stack/templates/rhel-registration/environment-rhel-registration.yaml"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/ansible-osp-registration.yml.j2"
+          dest: "/home/stack/ansible-osp-registration.yml"
           mode: "0644"
         - src: "osp/{{ redhat_osp_version }}/overcloud/overcloud-deploy.sh.j2"
           dest: "/home/stack/scripts/overcloud-deploy.sh"

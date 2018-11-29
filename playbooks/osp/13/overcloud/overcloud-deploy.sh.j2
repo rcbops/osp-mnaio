@@ -8,10 +8,6 @@ source /home/stack/stackrc
 openstack overcloud deploy --templates \
    -e /home/stack/templates/node-info.yaml \
    -e /home/stack/templates/undercloud_ssl_camap.yaml \
-{% if redhat_overcloud_register | bool %}
-   -e /home/stack/templates/rhel-registration/environment-rhel-registration.yaml \
-   -e /home/stack/templates/rhel-registration/rhel-registration-resource-registry.yaml \
-{% endif %}
 {% if enable_ceph_storage | bool %}
    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
    -e /home/stack/templates/ceph-custom-config.yaml \
@@ -42,3 +38,7 @@ openstack overcloud deploy --templates \
    -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/neutron-ovn-ha.yaml \
    --ntp-server pool.ntp.org \
    2>&1 | tee /home/stack/logs/overcloud_install.log
+
+{% if redhat_overcloud_register | bool %}
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /usr/bin/tripleo-ansible-inventory /home/stack/ansible-osp-registration.yml
+{% endif %}
