@@ -1,4 +1,12 @@
+resource_registry:
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/templates/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/templates/nic-configs/controller.yaml
+{% if enable_ceph_storage | bool %}
+  OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/ceph-storage.yaml
+{% endif %}
+
 parameter_defaults:
+  ControlPlaneDefaultRoute: 192.168.24.1
   OvercloudControllerFlavor: control
   OvercloudComputeFlavor: compute
   OvercloudCephStorageFlavor: ceph-storage
