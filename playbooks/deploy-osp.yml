@@ -196,6 +196,9 @@
         - src: "osp/{{ redhat_osp_version }}/overcloud/configure-barbican.yaml.j2"
           dest: "/home/stack/templates/configure-barbican.yaml"
           mode: "0644"
+        - src: "osp/{{ redhat_osp_version }}/overcloud/network_data.yaml.j2"
+          dest: "/home/stack/templates/network_data.yaml"
+          mode: "0644"
 
     - name: Introspect servers
       shell: |
