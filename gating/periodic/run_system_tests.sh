@@ -17,6 +17,8 @@ SYS_TEST_SOURCE_BASE="${SYS_TEST_SOURCE_BASE:-https://github.com/rcbops}"
 SYS_TEST_SOURCE="${SYS_TEST_SOURCE:-rpc-openstack-system-tests}"
 SYS_TEST_SOURCE_REPO="${SYS_TEST_SOURCE_BASE}/${SYS_TEST_SOURCE}"
 SYS_TEST_BRANCH="osp${REDHAT_OSP_VERSION}"
+SYS_JOB_SCENARIO=$(echo "${RE_JOB_SCENARIO}" | awk -F'_' \{'print $NF'\} |
+                   { read -r x; echo "${x##*[0-9]}";  })
 
 # Switch system test branch to `dev` on the experimental-asc job.
 # This job is specifically for running system tests under development.
@@ -43,7 +45,11 @@ git submodule update --recursive
 set +e
 
 # 2. Execute script from repository
-./execute_tests.sh
+if [[ -z $SYS_JOB_SCENARIO ]]; then
+  ./execute_tests.sh -s default
+else
+  ./execute_tests.sh -s default -s $SYS_JOB_SCENARIO
+fi
 [[ $? -ne 0 ]] && RC=$?  # record non-zero exit code
 
 # 3. Collect results from script, if they exist
