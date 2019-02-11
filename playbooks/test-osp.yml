@@ -33,22 +33,6 @@
       tags:
         - always
 
-    - name: Copy tempest script to director
-      template:
-        src: "osp/{{ redhat_osp_version }}/overcloud/overcloud-test.sh.j2"
-        dest: "/home/stack/scripts/overcloud-test.sh"
-        owner: "stack"
-        group: "stack"
-        mode: "0754"
-
-    - name: Copy tempest blacklist to director
-      template:
-        src: "osp/{{ redhat_osp_version }}/overcloud/tempest-blacklist.txt.j2"
-        dest: "/home/stack/tempest-blacklist.txt"
-        owner: "stack"
-        group: "stack"
-        mode: "0644"
-
     - name: Run tempest script on director
       shell: |
         set -o pipefail
