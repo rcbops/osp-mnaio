@@ -1,0 +1,34 @@
+#!/bin/bash
+# Prepare the undercloud for deploy
+
+set -eux
+
+# Source in undercloud credentials.
+source /home/stack/stackrc
+
+cd /home/stack/images
+for i in /usr/share/rhosp-director-images/overcloud-full-latest-10.0.tar /usr/share/rhosp-director-images/ironic-python-agent-latest-10.0.tar; do tar -xvf $i; done
+
+# Import images
+openstack overcloud image upload --image-path /home/stack/images/
+
+# Import inventory
+openstack overcloud node import /home/stack/instackenv.json
+
+# copy undercloud cert into undercloud_ssl_camap yml for injection into control nodes
+sudo cat /etc/pki/tls/certs/undercloud-192.168.24.2.pem | sed 's/^/        /' >> /home/stack/templates/undercloud_ssl_camap.yaml
+sudo chown stack:stack /home/stack/templates/undercloud_ssl_camap.yaml
+
+# set dns servers
+openstack subnet list | grep -i 192.168.24.0 | awk '{print $2}' | xargs -I '{}' openstack subnet set --dns-nameserver 8.8.8.8 --dns-nameserver 8.8.4.4 '{}'
+
+openstack baremetal node list | grep controller1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
+openstack baremetal node list | grep controller2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
+openstack baremetal node list | grep controller3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:control,boot_option:local' '{}'
+openstack baremetal node list | grep compute1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:compute,boot_option:local' '{}'
+openstack baremetal node list | grep compute2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:compute,boot_option:local' '{}'
+#openstack baremetal node list | grep ceph1 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
+#openstack baremetal node list | grep ceph2 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
+#openstack baremetal node list | grep ceph3 | awk '{print $2}' | xargs -I '{}' openstack baremetal node set --property capabilities='profile:ceph-storage,boot_option:local' '{}'
+
+

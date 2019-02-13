@@ -117,12 +117,28 @@
         timeout: 600
         state: started
 
-    - name: Installing tripleo client packages
+    - name: Install tripleo client package
       yum:
         pkg:
           - python-tripleoclient
+        state: installed
+
+    - name: Install ceph-ansible package
+      yum:
+        pkg:
           - ceph-ansible
         state: installed
+      when: enable_ceph_storage | bool
+
+    - name: Capture host private ssh key for instackenv.json for OSP10
+      shell: "cat /root/.ssh/id_rsa | tr -d '\n' | sed 's/KEY-----/KEY-----\\n/' | sed 's/-----END/\\n-----END/'"
+      register: private_ssh_key_oneliner
+      when: redhat_osp_version == '10'
+
+    - name: Set variable for private ssh key
+      set_fact:
+        private_ssh_key: '{{ private_ssh_key_oneliner.stdout_lines | join("\n") }}'
+      when: redhat_osp_version == '10'
 
     - name: Ensure OSP directory structure exists
       file:

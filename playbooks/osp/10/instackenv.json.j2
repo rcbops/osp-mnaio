@@ -1,0 +1,164 @@
+{
+    "nodes":[
+        {
+            "mac":[
+                "52:54:00:bd:80:01"
+            ],
+            "name":"controller1",
+            "cpu":"4",
+            "memory":"{{ controller_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:02"
+            ],
+            "name":"controller2",
+            "cpu":"4",
+            "memory":"{{ controller_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:03"
+            ],
+            "name":"controller3",
+            "cpu":"4",
+            "memory":"{{ controller_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:05"
+            ],
+            "name":"compute1",
+            "cpu":"4",
+            "memory":"{{ compute_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:06"
+            ],
+            "name":"compute2",
+            "cpu":"4",
+            "memory":"{{ compute_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+{% if enable_ceph_storage | bool %}
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:07"
+            ],
+            "name":"ceph1",
+            "cpu":"2",
+            "memory":"{{ ceph_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:08"
+            ],
+            "name":"ceph2",
+            "cpu":"2",
+            "memory":"{{ ceph_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:09"
+            ],
+            "name":"ceph3",
+            "cpu":"2",
+            "memory":"{{ ceph_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+{% endif %}
+{% if enable_swift_storage | bool %}
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:10"
+            ],
+            "name":"swift1",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:11"
+            ],
+            "name":"swift2",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        },
+        {
+            "mac":[
+                "52:54:00:bd:80:12"
+            ],
+            "name":"swift3",
+            "cpu":"2",
+            "memory":"{{ swift_vm_server_ram }}",
+            "disk":"90",
+            "arch":"x86_64",
+            "pm_type":"pxe_ssh",
+            "pm_user":"root",
+            "pm_password":"{{ private_ssh_key }}",
+            "pm_addr":"192.168.24.254"
+        }
+{% else %}
+        }
+{% endif %}
+    ]
+}
