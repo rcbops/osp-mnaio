@@ -15,11 +15,25 @@
         username: "{{ redhat_username }}"
         password: "{{ redhat_password }}"
         pool_ids: "{{ redhat_pool_id }}"
+      register: _register_task
+      until: _register_task is success
+      retries: 3
+      delay: 15
+      
     - name: Disable all repos
       command: "subscription-manager repos --disable *"
+      register: _disable_task
+      until: _disable_task is success
+      retries: 3
+      delay: 15
+
     - name: Enable Controller node repos
       command: "subscription-manager repos --enable {{ '{{' }} item {{ '}}' }}"
       with_items: "{{ '{{' }} repos {{ '}}' }}"
+      register: _enable_task
+      until: _enable_task is success
+      retries: 3
+      delay: 15
 
 - name: Register Ceph Repos
   hosts: Controller:CephStorage
@@ -31,3 +45,7 @@
     - name: Enable Ceph Repos on Controller and Ceph nodes
       command: "subscription-manager repos --enable {{ '{{' }} item {{ '}}' }}"
       with_items: "{{ '{{' }} repos {{ '}}' }}"
+      register: _enable_task
+      until: _enable_task is success
+      retries: 3
+      delay: 15
