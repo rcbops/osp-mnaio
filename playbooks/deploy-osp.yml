@@ -149,6 +149,13 @@
       with_filetree: "osp/{{ redhat_osp_version }}"
       when: item.state == "directory"
 
+    - name: Copy rhel-registration scripts to templates directory
+      synchronize:
+        src: /usr/share/openstack-tripleo-heat-templates/extraconfig/pre_deploy/rhel-registration
+        dest: /home/stack/templates/
+      delegate_to: "{{ inventory_hostname }}"
+      become_user: stack
+
     - name: Ensure OSP configuration files are populated from templates
       template:
         src: "{{ item.src }}"
