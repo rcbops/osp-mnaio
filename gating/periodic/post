@@ -68,3 +68,7 @@ popd
 # MIME type, for viewing within the browser in the web-based artifact interface
 find ${RESULTS_DIR} -type f -name '*.log' \
      -exec bash -c 'mv -v "${1}" "${1/%.log/.txt}"' - '{}' \;
+
+if [ "${OSP_JOB_ACTION}" = "deploy-system-tests" ]; then
+    bash -c "$(readlink -f $(dirname ${0})/upload_test_results_to_qtest.sh)"
+fi
