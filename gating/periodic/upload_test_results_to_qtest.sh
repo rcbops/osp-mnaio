@@ -36,10 +36,6 @@ cat <<-EOF >$ZIGZAG_CONFIG_FILE
 }
 EOF
 
-## Functions -----------------------------------------------------------------
-
-source $(dirname ${0})/../../scripts/functions.sh
-
 ## Main ----------------------------------------------------------------------
 
 # Create virtualenv for <TOOL NAME>
