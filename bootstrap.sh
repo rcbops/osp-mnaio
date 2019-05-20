@@ -87,4 +87,4 @@ fi
 sudo python -m easy_install --upgrade pyOpenSSL
 
 # install latest OSA supported Ansible version
-sudo pip install ansible ara
+sudo pip install ansible==2.7.10 ara
