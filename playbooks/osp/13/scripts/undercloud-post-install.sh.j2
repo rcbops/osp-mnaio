@@ -5,6 +5,8 @@ set -eux
 
 # Source in undercloud credentials.
 source /home/stack/stackrc
+# NOTE(npawelek): Fixes an issue with Zaqar's hardcoded websocket certificate
+export WEBSOCKET_CLIENT_CA_BUNDLE=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
 
 cd /home/stack/images
 find /usr/share/rhosp-director-images -name '*.tar' -exec tar xf {} \;
